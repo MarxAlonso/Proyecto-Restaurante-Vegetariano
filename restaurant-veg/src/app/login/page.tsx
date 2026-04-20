@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { Chrome } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 transition-colors relative">
+      <div className="absolute top-8 right-8">
+        <ThemeToggle />
+      </div>
       <div className="card max-w-md w-full p-8 space-y-8 bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800">
         <div className="text-center">
           <Link href="/" className="text-3xl font-bold text-primary">
