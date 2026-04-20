@@ -1,30 +1,30 @@
 import { ShoppingBag, Clock, Star, TrendingUp } from "lucide-react";
 
 const STATS = [
-  { label: "Pedidos Totales", value: "12", icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-  { label: "En Camino", value: "1", icon: Clock, color: "text-orange-600", bg: "bg-orange-50" },
-  { label: "Puntos Veg", value: "450", icon: Star, color: "text-yellow-600", bg: "bg-yellow-50" },
-  { label: "Ahorro Mensual", value: "S/ 85", icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
+  { label: "Pedidos Totales", value: "12", icon: ShoppingBag, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/20" },
+  { label: "En Camino", value: "1", icon: Clock, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-900/20" },
+  { label: "Puntos Veg", value: "450", icon: Star, color: "text-yellow-600 dark:text-yellow-400", bg: "bg-yellow-50 dark:bg-yellow-900/20" },
+  { label: "Ahorro Mensual", value: "S/ 85", icon: TrendingUp, color: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-900/20" },
 ];
 
 export default function ClientDashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 transition-colors">
       <div>
-        <h1 className="text-2xl font-bold mb-2">¡Hola, Juan! 👋</h1>
-        <p className="text-zinc-500">Aquí tienes un resumen de tus pedidos y actividad.</p>
+        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">¡Hola, Juan! 👋</h1>
+        <p className="text-zinc-500 dark:text-zinc-400">Aquí tienes un resumen de tus pedidos y actividad.</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {STATS.map((stat) => (
-          <div key={stat.label} className="card p-6 flex items-center gap-4">
+          <div key={stat.label} className="card p-6 flex items-center gap-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
             <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
               <stat.icon size={24} />
             </div>
             <div>
-              <p className="text-sm text-zinc-500 font-medium">{stat.label}</p>
-              <p className="text-2xl font-bold">{stat.value}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">{stat.label}</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{stat.value}</p>
             </div>
           </div>
         ))}

@@ -18,7 +18,7 @@ const MENU_ITEMS = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-zinc-900 text-white flex flex-col">
+    <aside className="w-64 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-800 flex flex-col transition-colors">
       <div className="p-6">
         <Link href="/" className="text-xl font-bold text-primary">
           RESTAURANT<span className="text-secondary">VEG</span>
@@ -31,7 +31,7 @@ export default function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors group"
+            className="flex items-center gap-3 px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors group"
           >
             <item.icon size={20} className="group-hover:text-primary transition-colors" />
             <span className="font-medium">{item.label}</span>
@@ -39,8 +39,8 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-zinc-800">
-        <button className="flex items-center gap-3 px-4 py-3 w-full text-zinc-400 hover:bg-red-900/20 hover:text-red-500 rounded-lg transition-colors group">
+      <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
+        <button className="flex items-center gap-3 px-4 py-3 w-full text-zinc-600 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 rounded-lg transition-colors group">
           <LogOut size={20} />
           <span className="font-medium">Cerrar Sesión</span>
         </button>

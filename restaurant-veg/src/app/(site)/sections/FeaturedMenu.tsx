@@ -29,10 +29,10 @@ const MENU_ITEMS = [
 
 export default function FeaturedMenu() {
   return (
-    <section className="bg-white dark:bg-black py-20">
+    <section className="bg-white dark:bg-zinc-950 py-20 transition-colors">
       <div className="section-container">
         <div className="text-center mb-16">
-          <h2 className="title-main mb-4">Platos Destacados</h2>
+          <h2 className="title-main mb-4 text-zinc-900 dark:text-white">Platos Destacados</h2>
           <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
             Una selección de nuestros platos más aclamados, preparados con los ingredientes más frescos.
           </p>
@@ -40,7 +40,7 @@ export default function FeaturedMenu() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {MENU_ITEMS.map((item) => (
-            <div key={item.id} className="card group">
+            <div key={item.id} className="card group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
               <div className="relative h-64 overflow-hidden">
                 <img 
                   src={item.image} 
@@ -53,7 +53,7 @@ export default function FeaturedMenu() {
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold">{item.name}</h3>
+                  <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{item.name}</h3>
                   <span className="text-primary font-bold">{item.price}</span>
                 </div>
                 <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6">
