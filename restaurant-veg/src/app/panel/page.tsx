@@ -11,7 +11,7 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-8 transition-colors">
       <div>
-        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">¡Hola, Juan! 👋</h1>
+        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">¡Hola, Marx! 👋</h1>
         <p className="text-zinc-500 dark:text-zinc-400">Aquí tienes un resumen de tus pedidos y actividad.</p>
       </div>
 
@@ -37,7 +37,7 @@ export default function ClientDashboard() {
             <h2 className="text-lg font-bold">Pedidos Recientes</h2>
             <button className="text-primary text-sm font-semibold hover:underline">Ver todo</button>
           </div>
-          
+
           <div className="card divide-y divide-zinc-100 dark:divide-zinc-800">
             {[1, 2, 3].map((order) => (
               <div key={order} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
