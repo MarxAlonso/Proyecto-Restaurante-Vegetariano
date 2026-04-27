@@ -1,0 +1,14 @@
+{
+  "name": "proyecto-restaurante-vegetariano",
+  "version": "1.0.0",
+  "description": "Monorepo para el Proyecto Restaurante Vegetariano",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "start": "pnpm -r start"
+  },
+  "devDependencies": {
+    "pnpm": "^9.0.0"
+  }
+}

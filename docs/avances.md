@@ -22,4 +22,27 @@
 
 #### Documentación
 - [x] Creación de estructura de documentación y registro de avances.
-- [x] Documentación detallada de la elección y estructura de la Arquitectura Hexagonal.
+## 2026-04-27: Reestructuración Monorepo e Integración de Cocina
+
+### Objetivos del día:
+1.  **Migración a Monorepo**: Configurar `pnpm` workspaces y organizar paquetes en `packages/`.
+2.  **Finalización de Módulo de Cocina**: Migrar la lógica de "Kitchen" al módulo de pedidos y conectar el frontend.
+3.  **Limpieza de Arquitectura**: Eliminar archivos y carpetas obsoletos de la estructura anterior.
+
+### Avances Detallados:
+
+#### Infraestructura (Monorepo)
+- [x] Configuración de `pnpm-workspace.yaml` y root `package.json`.
+- [x] Reubicación de `backend` y `frontend` a la carpeta `apps/`.
+- [x] Creación de carpeta `packages/` para configuraciones compartidas (eslint, tsconfig).
+
+#### Backend
+- [x] Extensión de `OrderRepository` para incluir estadísticas por estado.
+- [x] Implementación de `countByStatus` en Prisma.
+- [x] Creación de endpoint `GET /api/orders/stats` para el panel de cocina.
+- [x] Limpieza de carpetas obsoletas (`routes/`, `controllers/`, etc. antiguos).
+
+#### Frontend
+- [x] Conversión del Panel de Cocina a Client Component.
+- [x] Conexión en tiempo real (polling) con la API de pedidos.
+- [x] Implementación de transiciones de estado de pedido (Preparar -> Listo -> Entregar).
