@@ -110,10 +110,24 @@ El sistema implementa una estrategia de **Modo Claro** y **Modo Oscuro** global:
 
 ## 🚀 Desarrollo
 
+Este proyecto utiliza **pnpm** como gestor de paquetes y está organizado como un monorepo (Frontend & Backend).
+
 Para iniciar el proyecto en entorno local:
 
 ```bash
-cd restaurant-veg
-npm install
-npm run dev
+# Instalar dependencias
+pnpm install
+
+# Iniciar todos los servicios (Frontend y Backend) en paralelo
+pnpm dev
+```
+
+### Otros Comandos Útiles
+
+```bash
+# Construir todos los proyectos
+pnpm build
+
+# Iniciar en modo producción
+pnpm start
 ```
