@@ -7,11 +7,9 @@ import {
   Mail, 
   Clock, 
   Send, 
-  Instagram, 
-  Facebook, 
-  Twitter,
   ExternalLink
 } from "lucide-react";
+import { FaInstagram, FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 
 export default function ContactoPage() {
@@ -59,7 +57,7 @@ export default function ContactoPage() {
             <div className="pt-6">
               <h4 className="font-bold mb-4 px-2">Síguenos</h4>
               <div className="flex gap-4">
-                {[Instagram, Facebook, Twitter].map((Icon, idx) => (
+                {[FaInstagram, FaFacebook, FaXTwitter].map((Icon, idx) => (
                   <motion.button
                     key={idx}
                     whileHover={{ scale: 1.1, y: -2 }}
