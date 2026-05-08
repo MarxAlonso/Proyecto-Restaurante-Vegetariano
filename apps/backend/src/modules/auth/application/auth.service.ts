@@ -7,7 +7,7 @@ export class AuthService {
   constructor(private userRepository: UserRepository) {}
 
   async register(data: any) {
-    const { email, password, name, role = 'CLIENT' } = data;
+    const { email, password, name } = data; // Ignore role passed from frontend
 
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -20,7 +20,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      role: role.toUpperCase() as any,
+      role: 'CLIENT', // Force CLIENT role for public registration
     });
 
     const token = this.generateToken(newUser);

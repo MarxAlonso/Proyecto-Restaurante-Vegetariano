@@ -24,7 +24,12 @@ export class MenuController {
 
   async create(req: Request, res: Response) {
     try {
-      const item = await this.menuService.createItem(req.body);
+      const data = { ...req.body };
+      if (req.file) {
+        data.image = `/uploads/${req.file.filename}`;
+      }
+      
+      const item = await this.menuService.createItem(data);
       res.status(201).json(item);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -33,7 +38,12 @@ export class MenuController {
 
   async update(req: Request, res: Response) {
     try {
-      const item = await this.menuService.updateItem(req.params.id as string, req.body);
+      const data = { ...req.body };
+      if (req.file) {
+        data.image = `/uploads/${req.file.filename}`;
+      }
+
+      const item = await this.menuService.updateItem(req.params.id as string, data);
       res.json(item);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
