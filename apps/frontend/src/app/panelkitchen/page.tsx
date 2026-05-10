@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Clock, Check, AlertCircle, ChefHat } from "lucide-react";
 import { fetchApi } from "@/lib/api";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function KitchenDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -37,7 +38,7 @@ export default function KitchenDashboard() {
         method: 'PATCH',
         body: JSON.stringify({ status: nextStatus }),
       });
-      
+
       fetchOrders(); // Refresh
     } catch (err: any) {
       alert("Error al actualizar: " + err.message);
@@ -63,16 +64,14 @@ export default function KitchenDashboard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-colors">
       {orders.map((order) => (
-        <div 
-          key={order.id} 
-          className={`flex flex-col h-fit rounded-2xl border-2 overflow-hidden bg-white dark:bg-zinc-900 ${
-            order.status === 'PENDING' ? 'border-red-600' : 'border-zinc-200 dark:border-zinc-800'
-          }`}
+        <Card
+          key={order.id}
+          className={`flex flex-col overflow-hidden border-2 ${order.status === 'PENDING' ? 'border-red-600' : ''
+            }`}
         >
           {/* Order Header */}
-          <div className={`p-4 flex items-center justify-between ${
-            order.status === 'PENDING' ? 'bg-red-600 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-300'
-          }`}>
+          <CardHeader className={`p-4 flex flex-row items-center justify-between space-y-0 ${order.status === 'PENDING' ? 'bg-red-600 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-300'
+            }`}>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-black">#{order.id.slice(0, 4)}</span>
               <span className="text-sm font-bold opacity-80 uppercase">Mesa {order.user?.name || "???"}</span>
@@ -81,10 +80,10 @@ export default function KitchenDashboard() {
               <Clock size={16} />
               {getTimeElapsed(order.createdAt)}
             </div>
-          </div>
+          </CardHeader>
 
           {/* Order Content */}
-          <div className="p-4 flex-1 space-y-4">
+          <CardContent className="p-4 flex-1 space-y-4">
             {order.items.map((item: any, idx: number) => (
               <div key={idx} className="flex gap-3">
                 <span className="text-xl font-black text-secondary">{item.quantity}x</span>
@@ -99,14 +98,14 @@ export default function KitchenDashboard() {
                 </div>
               </div>
             ))}
-          </div>
+          </CardContent>
 
           {/* Order Footer */}
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-black/40 flex gap-2">
             <button className="flex-1 py-3 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold transition-colors uppercase">
               {order.status}
             </button>
-            <button 
+            <button
               onClick={() => handleUpdateStatus(order.id, order.status)}
               className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
             >
@@ -114,7 +113,7 @@ export default function KitchenDashboard() {
               {order.status === 'PENDING' ? 'PREPARAR' : order.status === 'PREPARING' ? 'LISTO' : 'ENTREGAR'}
             </button>
           </div>
-        </div>
+        </Card>
       ))}
 
       {orders.length === 0 && (

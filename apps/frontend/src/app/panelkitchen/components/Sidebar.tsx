@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { 
   ChefHat, 
@@ -6,6 +8,7 @@ import {
   History,
   LogOut 
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const MENU_ITEMS = [
   { icon: ListTodo, label: "Pedidos Pendientes", href: "/panelkitchen" },
@@ -14,6 +17,8 @@ const MENU_ITEMS = [
 ];
 
 export default function Sidebar() {
+  const { logout } = useAuth();
+
   return (
     <aside className="w-20 lg:w-64 bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 flex flex-col transition-all">
       <div className="p-6 flex items-center gap-3">
@@ -35,7 +40,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-        <button className="flex items-center gap-4 p-3 w-full hover:bg-red-50 dark:hover:bg-red-950/30 text-zinc-500 hover:text-red-500 rounded-xl transition-colors">
+        <button 
+          onClick={logout}
+          className="flex items-center gap-4 p-3 w-full hover:bg-red-50 dark:hover:bg-red-950/30 text-zinc-500 hover:text-red-500 rounded-xl transition-colors"
+        >
           <LogOut size={24} />
           <span className="font-semibold hidden lg:inline">Salir</span>
         </button>

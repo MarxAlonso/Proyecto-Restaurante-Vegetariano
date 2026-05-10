@@ -1,7 +1,9 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 import path from 'path';
 
@@ -10,10 +12,33 @@ import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route.js'
 import orderRoutes from './modules/order/infrastructure/http/routes/order.route.js';
 import usersRoutes from './modules/users/infrastructure/http/routes/users.route.js';
 
+import { seedDatabase } from './infrastructure/persistence/db-seed.js';
+
 dotenv.config();
 
-const app = express();
+// Seed database on startup
+seedDatabase().catch(err => {
+  console.error('❌ Error during seeding:', err);
+});
+
+const app: Application = express();
 const PORT = process.env.PORT || 3001;
+
+// Middlewares de Seguridad
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Permite cargar imágenes desde otro origen (Frontend)
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Límite de 100 peticiones por IP cada 15 minutos
+  message: { error: 'Demasiadas peticiones desde esta IP, por favor intente de nuevo más tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Aplicar rate limiting solo a rutas de API
+app.use('/api', limiter);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { 
   LayoutDashboard, 
@@ -6,6 +8,7 @@ import {
   User, 
   LogOut 
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const MENU_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/panel" },
@@ -15,6 +18,8 @@ const MENU_ITEMS = [
 ];
 
 export default function Sidebar() {
+  const { logout } = useAuth();
+
   return (
     <aside className="w-64 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex flex-col">
       <div className="p-6">
@@ -37,7 +42,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-        <button className="flex items-center gap-3 px-4 py-3 w-full text-zinc-600 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 rounded-lg transition-colors group">
+        <button 
+          onClick={logout}
+          className="flex items-center gap-3 px-4 py-3 w-full text-zinc-600 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 rounded-lg transition-colors group"
+        >
           <LogOut size={20} />
           <span className="font-medium">Cerrar Sesión</span>
         </button>

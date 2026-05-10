@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import prisma from '../../../../infrastructure/persistence/prisma.client.js';
+import prisma from '../../../infrastructure/persistence/prisma.client.js';
 
 export class UsersService {
   async createWorker(data: any) {
@@ -18,7 +18,7 @@ export class UsersService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const newUser = await prisma.user.create({
       data: {
         email,
