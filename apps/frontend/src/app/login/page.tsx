@@ -1,7 +1,49 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { fetchApi } from "@/lib/api";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const data = await fetchApi("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      // Guardar token en localStorage (para fetchApi)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirección según el rol
+      const role = data.user.role;
+      if (role === "ADMIN") {
+        router.push("/paneladmin");
+      } else if (role === "KITCHEN") {
+        router.push("/panelkitchen");
+      } else {
+        router.push("/panel");
+      }
+    } catch (err: any) {
+      setError(err.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 transition-colors relative">
       <div className="absolute top-8 right-8">
@@ -16,7 +58,13 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-zinc-500">Ingresa a tu cuenta para continuar.</p>
         </div>
 
-        <form className="space-y-4">
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-4 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300" htmlFor="email">
               Correo Electrónico
@@ -24,9 +72,12 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="nombre@ejemplo.com"
               className="input text-zinc-900 dark:text-white"
               required
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -41,14 +92,21 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="input text-zinc-900 dark:text-white"
               required
+              disabled={loading}
             />
           </div>
 
-          <button type="submit" className="w-full btn-primary !py-3 font-bold text-lg">
-            Iniciar Sesión
+          <button 
+            type="submit" 
+            className="w-full btn-primary !py-3 font-bold text-lg disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Iniciando..." : "Iniciar Sesión"}
           </button>
         </form>
 
@@ -64,6 +122,7 @@ export default function LoginPage() {
         <button 
           type="button" 
           className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-zinc-200 dark:border-zinc-800 rounded-lg font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all active:scale-95 text-zinc-700 dark:text-zinc-200"
+          disabled={loading}
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
