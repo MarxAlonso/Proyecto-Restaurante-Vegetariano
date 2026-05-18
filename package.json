@@ -8,7 +8,11 @@
     "build": "pnpm -r build",
     "start": "pnpm -r start",
     "test:selenium": "pnpm --filter selenium-test-nutribrain test",
-    "test:selenium:watch": "pnpm --filter selenium-test-nutribrain test:watch"
+    "test:selenium:watch": "pnpm --filter selenium-test-nutribrain test:watch",
+    "test:playwright": "pnpm --filter restaurant-veg exec playwright test",
+    "test:playwright:ui": "pnpm --filter restaurant-veg exec playwright test --ui",
+    "test:backend": "pnpm --filter restaurant-veg-backend test",
+    "test:all": "pnpm test:backend && pnpm test:selenium && pnpm test:playwright"
   },
   "devDependencies": {
     "pnpm": "^9.0.0"

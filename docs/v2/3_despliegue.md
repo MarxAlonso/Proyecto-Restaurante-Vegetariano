@@ -126,29 +126,58 @@ Para auditar las tablas en producción de forma ágil y segura sin alterar scrip
 
 ---
 
-## 5. Pruebas de Calidad E2E Automatizadas (Selenium Webdriver)
-Para superar los estándares universitarios convencionales, se ha integrado una suite de **pruebas de caja negra automatizadas (E2E)** en el monorepo bajo `apps/selenium-test-nutribrain` utilizando **Selenium Webdriver 4** + **TypeScript** + **Vitest**.
+## 5. Pruebas de Calidad Automatizadas Multi-Capa (Selenium + Playwright + Supertest)
+Para cumplir con los más altos estándares de ingeniería de software, el monorepo implementa una **Pirámide de Pruebas** automatizada de tres niveles que cubre de extremo a extremo (E2E) y en aislamiento la robustez del sistema:
 
-### 5.1. Cobertura del Plan de Pruebas Automatizado
-La suite ejecuta tres suites de especificaciones principales que replican y automatizan el comportamiento del usuario en tiempo real:
+### 5.1. Capa 1: Pruebas de Integración de API HTTP (Supertest + Vitest en el Backend)
+Ejecutadas en aislamiento bajo `apps/backend/src/tests/api.spec.ts`. Prueban la lógica de negocio y conectividad ORM sin abrir navegadores:
+*   **Healthcheck ([api.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/backend/src/tests/api.spec.ts))**: Valida que `GET /api/health` retorne `200 OK` y el estado del servidor.
+*   **Autenticación Fallida**: Valida que credenciales inválidas retornen códigos HTTP `400/401` y un JSON estructurado con el error.
+*   **Autenticación Exitosa**: Valida que el administrador semilla genere correctamente el token JWT de sesión al loguearse.
+*   **Catálogo de Platos**: Valida que `GET /api/menu` devuelva el listado de platos de la base de datos PostgreSQL.
 
-1.  **Pruebas de Navegación y Accesibilidad ([navigation.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/navigation.spec.ts))**:
-    *   Valida la carga correcta de la landing page pública y la presencia del título H1 (`Sabor Natural & Parrilla Premium`).
-    *   Verifica la existencia y enlace de los botones CTA de menú y reserva de mesas.
-    *   Automatiza el clic del **ThemeToggle** y evalúa la inyección física de las clases de tema (`.dark`) en la etiqueta `<html>`, asegurando el cumplimiento de la accesibilidad claro/oscuro.
-2.  **Pruebas de Flujos de Autenticación ([auth.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/auth.spec.ts))**:
-    *   **Login Fallido**: Ingresa credenciales erróneas y verifica la aparición dinámica del mensaje de error de Express/Prisma.
-    *   **Login Cliente Exitoso**: Automatiza el inicio de sesión del usuario semilla `cliente@restaurant.com` y comprueba la redirección física e inmediata a la URL `/panel`.
-    *   **Login Administrador Exitoso**: Autentica a `admin@restaurant.com` y aserta la redirección protegida a la URL `/paneladmin`.
-3.  **Pruebas de Seguridad Web ([security.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/security.spec.ts))**:
-    *   **Mitigación de Cross-Site Scripting (XSS)**: Introduce scripts activos (`<script>alert(...)`) en las contraseñas y verifica que el sistema sanitice e impida la ejecución de scripts en el cliente.
-    *   **Mitigación de Inyección SQL (SQLi)**: Introduce cargas útiles SQL (`' OR '1'='1`) y verifica que Prisma neutralice la evasión de autenticación, denegando el acceso de manera robusta.
+### 5.2. Capa 2: Pruebas E2E de UI Modernas (Playwright en el Frontend)
+Ejecutadas en `apps/frontend/tests/`. Playwright provee automatización de UI ultra veloz con renderizado en paralelo y modo depuración interactivo:
+*   **Navegación y Accesibilidad ([navigation.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/frontend/tests/navigation.spec.ts))**: Valida la carga de la Landing Page, botones CTA principales y la inyección de clases Claro/Oscuro de `next-themes` en el DOM (`html`).
+*   **Control de Accesos por Roles ([auth.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/frontend/tests/auth.spec.ts))**: Automatiza login fallido y exitoso para Cliente (`client@restveg.com`) y Administrador (`admin@restveg.com`), asertando redirecciones a `/panel` y `/paneladmin` y la correcta carga de datos reales (saludos y métricas de clientes).
 
-### 5.2. Instrucciones para la Demostración Ante el Jurado
-Para iniciar las pruebas en vivo:
-1.  Asegurarse de tener el frontend corriendo en local en `http://localhost:3000`.
-2.  Ejecutar en la terminal raíz:
+### 5.3. Capa 3: Pruebas E2E de Compatibilidad Industrial (Selenium Webdriver)
+Ejecutadas en `apps/selenium-test-nutribrain/src/specs/`. Selenium 4 provee validación tradicional de caja negra en navegadores locales reales:
+*   **Navegación ([navigation.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/navigation.spec.ts))**: Navegación y alternancia de accesibilidad global.
+*   **Autenticación ([auth.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/auth.spec.ts))**: Login, control de accesos a paneles y validación de elementos dinámicos de base de datos.
+*   **Seguridad Web ([security.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/security.spec.ts))**: Intento de inyecciones de código malicioso (ataques Cross-Site Scripting (XSS) y SQL Injection (SQLi) clásicos), validando que las entradas se saniticen correctamente en el cliente y el backend.
+
+---
+
+## 6. Instrucciones de Ejecución para la Sustentación Académica
+
+Para realizar demostraciones en vivo ante el jurado calificador:
+
+### 6.1. Correr Pruebas del Backend (Supertest)
+Ejecuta la suite en memoria en menos de 2 segundos:
+```bash
+pnpm test:backend
+```
+
+### 6.2. Correr Pruebas del Frontend (Playwright)
+Asegúrate de iniciar el servidor local con `pnpm dev` en paralelo.
+*   **Modo Headless (Consola)**:
     ```bash
-    pnpm test:selenium
+    pnpm test:playwright
     ```
-3.  El jurado observará cómo una ventana del navegador Google Chrome se abre de forma autónoma, escribe los campos a la velocidad del rayo y valida cada caso de prueba en color verde en menos de 5 segundos.
+*   **¡Modo Interactivo de Depuración UI (Recomendado) 🌟!**:
+    ```bash
+    pnpm test:playwright:ui
+    ```
+
+### 6.3. Correr Pruebas E2E Clásicas (Selenium)
+Con `pnpm dev` activo en paralelo:
+```bash
+pnpm test:selenium
+```
+
+### 6.4. Ejecutar Todo el Pipeline de Calidad
+Valida de punta a punta el backend, Selenium y Playwright consecutivamente:
+```bash
+pnpm test:all
+```
