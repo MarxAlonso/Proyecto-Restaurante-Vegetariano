@@ -27,7 +27,7 @@ describe('Pruebas de Seguridad Web Automatizadas (Mitigaciones) - RESTVEG', () =
     
     // El campo de email espera un formato de email válido por validación nativa HTML5,
     // por lo que usaremos un email válido pero inyectaremos la carga en el password.
-    await emailInput.sendKeys('test_seguridad@restaurant.com');
+    await emailInput.sendKeys('test_seguridad@restveg.com');
     await passwordInput.sendKeys(xssPayload);
     await submitBtn.click();
 
@@ -70,7 +70,7 @@ describe('Pruebas de Seguridad Web Automatizadas (Mitigaciones) - RESTVEG', () =
     
     // Como el input es type="email", usaremos una estructura de email que incluya SQL injection
     // para probar la sanitización de Prisma en el backend en caso de saltarse la validación nativa.
-    await emailInput.sendKeys('admin@restaurant.com');
+    await emailInput.sendKeys('admin@restveg.com');
     await passwordInput.sendKeys(sqlPayload);
     await submitBtn.click();
 

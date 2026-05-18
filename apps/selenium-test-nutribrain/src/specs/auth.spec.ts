@@ -25,7 +25,7 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
     const submitBtn = await driver.findElement(By.css('button[type="submit"]'));
 
     // 3. Completar con credenciales erróneas
-    await emailInput.sendKeys('invalido@restaurant.com');
+    await emailInput.sendKeys('invalido@restveg.com');
     await passwordInput.sendKeys('claveincorrecta');
     await submitBtn.click();
 
@@ -37,7 +37,7 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
     const errorText = await errorTextElement.getText();
 
     expect(errorText).toBeTruthy();
-    expect(errorText.toLowerCase()).toContain('error');
+    expect(errorText.toLowerCase()).toMatch(/error|invalid|credenciales/);
   });
 
   it('Debería iniciar sesión correctamente como CLIENTE y redirigir al panel correspondiente', async () => {
@@ -49,9 +49,9 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
 
     // Limpiar campos y llenar credenciales de cliente semilla
     await emailInput.clear();
-    await emailInput.sendKeys('cliente@restaurant.com');
+    await emailInput.sendKeys('client@restveg.com');
     await passwordInput.clear();
-    await passwordInput.sendKeys('password123');
+    await passwordInput.sendKeys('client123');
     await submitBtn.click();
 
     // Esperar a que la URL cambie y contenga '/panel'
@@ -59,6 +59,17 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
 
     const currentUrl = await driver.getCurrentUrl();
     expect(currentUrl).toContain('/panel');
+
+    // 4. Verificar la visualización correcta de los datos del panel (Dashboard del Cliente)
+    const headerTitleElement = await driver.wait(
+      until.elementLocated(By.xpath("//h1[contains(text(), '¡Hola, Marx!')]")),
+      10000
+    );
+    const headerTitle = await headerTitleElement.getText();
+    expect(headerTitle).toContain('¡Hola, Marx!');
+
+    const pointsCard = await driver.findElement(By.xpath("//p[contains(text(), 'Puntos Veg')]"));
+    expect(await pointsCard.isDisplayed()).toBe(true);
 
     // Desconectarse para la siguiente prueba (limpiando almacenamiento local)
     await driver.executeScript('localStorage.clear(); sessionStorage.clear();');
@@ -73,9 +84,9 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
 
     // Limpiar campos y llenar credenciales del admin semilla
     await emailInput.clear();
-    await emailInput.sendKeys('admin@restaurant.com');
+    await emailInput.sendKeys('admin@restveg.com');
     await passwordInput.clear();
-    await passwordInput.sendKeys('password123');
+    await passwordInput.sendKeys('admin123');
     await submitBtn.click();
 
     // Esperar a que la URL cambie y contenga '/paneladmin'
@@ -83,6 +94,17 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
 
     const currentUrl = await driver.getCurrentUrl();
     expect(currentUrl).toContain('/paneladmin');
+
+    // 4. Verificar la visualización correcta de los datos del panel (Dashboard)
+    const headerTitleElement = await driver.wait(
+      until.elementLocated(By.xpath("//h1[contains(text(), 'Dashboard Administrativo')]")),
+      10000
+    );
+    const headerTitle = await headerTitleElement.getText();
+    expect(headerTitle).toBe('Dashboard Administrativo');
+
+    const clientsCard = await driver.findElement(By.xpath("//p[contains(text(), 'Clientes Registrados')]"));
+    expect(await clientsCard.isDisplayed()).toBe(true);
 
     // Limpiar el estado de autenticación al finalizar
     await driver.executeScript('localStorage.clear(); sessionStorage.clear();');
