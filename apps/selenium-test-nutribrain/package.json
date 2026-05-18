@@ -1,0 +1,21 @@
+{
+  "name": "selenium-test-nutribrain",
+  "version": "1.0.0",
+  "description": "Suite de pruebas automatizadas con Selenium y Vitest para Restaurant Veg",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/selenium-webdriver": "^4.1.22",
+    "typescript": "^5.7.3",
+    "vitest": "^1.6.0"
+  }
+}

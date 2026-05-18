@@ -123,3 +123,32 @@ Para auditar las tablas en producción de forma ágil y segura sin alterar scrip
     $env:DATABASE_URL="TU_DATABASE_URL_DE_RAILWAY"; pnpm exec prisma studio
     ```
 2.  Prisma Studio levanta una consola web en `http://localhost:5555` que nos permite navegar por las tablas del servidor cloud en Railway de manera interactiva para validar las órdenes realizadas en vivo por los clientes.
+
+---
+
+## 5. Pruebas de Calidad E2E Automatizadas (Selenium Webdriver)
+Para superar los estándares universitarios convencionales, se ha integrado una suite de **pruebas de caja negra automatizadas (E2E)** en el monorepo bajo `apps/selenium-test-nutribrain` utilizando **Selenium Webdriver 4** + **TypeScript** + **Vitest**.
+
+### 5.1. Cobertura del Plan de Pruebas Automatizado
+La suite ejecuta tres suites de especificaciones principales que replican y automatizan el comportamiento del usuario en tiempo real:
+
+1.  **Pruebas de Navegación y Accesibilidad ([navigation.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/navigation.spec.ts))**:
+    *   Valida la carga correcta de la landing page pública y la presencia del título H1 (`Sabor Natural & Parrilla Premium`).
+    *   Verifica la existencia y enlace de los botones CTA de menú y reserva de mesas.
+    *   Automatiza el clic del **ThemeToggle** y evalúa la inyección física de las clases de tema (`.dark`) en la etiqueta `<html>`, asegurando el cumplimiento de la accesibilidad claro/oscuro.
+2.  **Pruebas de Flujos de Autenticación ([auth.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/auth.spec.ts))**:
+    *   **Login Fallido**: Ingresa credenciales erróneas y verifica la aparición dinámica del mensaje de error de Express/Prisma.
+    *   **Login Cliente Exitoso**: Automatiza el inicio de sesión del usuario semilla `cliente@restaurant.com` y comprueba la redirección física e inmediata a la URL `/panel`.
+    *   **Login Administrador Exitoso**: Autentica a `admin@restaurant.com` y aserta la redirección protegida a la URL `/paneladmin`.
+3.  **Pruebas de Seguridad Web ([security.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/security.spec.ts))**:
+    *   **Mitigación de Cross-Site Scripting (XSS)**: Introduce scripts activos (`<script>alert(...)`) en las contraseñas y verifica que el sistema sanitice e impida la ejecución de scripts en el cliente.
+    *   **Mitigación de Inyección SQL (SQLi)**: Introduce cargas útiles SQL (`' OR '1'='1`) y verifica que Prisma neutralice la evasión de autenticación, denegando el acceso de manera robusta.
+
+### 5.2. Instrucciones para la Demostración Ante el Jurado
+Para iniciar las pruebas en vivo:
+1.  Asegurarse de tener el frontend corriendo en local en `http://localhost:3000`.
+2.  Ejecutar en la terminal raíz:
+    ```bash
+    pnpm test:selenium
+    ```
+3.  El jurado observará cómo una ventana del navegador Google Chrome se abre de forma autónoma, escribe los campos a la velocidad del rayo y valida cada caso de prueba en color verde en menos de 5 segundos.
