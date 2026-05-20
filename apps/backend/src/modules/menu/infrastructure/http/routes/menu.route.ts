@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { MenuController } from '../controllers/menu.controller.js';
-import { MenuService } from '../../../application/menu.service.js';
-import { PrismaMenuItemRepository } from '../../persistence/prisma-menu-item.repository.js';
-import { authenticate, requireRole } from '../../../../../middleware/auth.js';
-import { upload } from '../../../../../middleware/upload.middleware.js';
+import { MenuController } from '../controllers/menu.controller';
+import { MenuService } from '../../../application/menu.service';
+import { PrismaMenuItemRepository } from '../../persistence/prisma-menu-item.repository';
+import { authenticate, requireRole } from '../../../../../middleware/auth';
+import { upload } from '../../../../../middleware/upload.middleware';
 
 const router: Router = Router();
 

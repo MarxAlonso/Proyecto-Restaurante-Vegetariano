@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { UsersController } from '../controllers/users.controller.js';
-import { UsersService } from '../../../application/users.service.js';
-import { authenticate, requireRole } from '../../../../../middleware/auth.js';
+import { UsersController } from '../controllers/users.controller';
+import { UsersService } from '../../../application/users.service';
+import { authenticate, requireRole } from '../../../../../middleware/auth';
 
 const router: Router = Router();
 

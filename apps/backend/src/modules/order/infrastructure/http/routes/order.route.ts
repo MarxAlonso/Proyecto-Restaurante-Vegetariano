@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { OrderController } from '../controllers/order.controller.js';
-import { OrderService } from '../../../application/order.service.js';
-import { PrismaOrderRepository } from '../../persistence/prisma-order.repository.js';
-import { authenticate, requireRole } from '../../../../../middleware/auth.js';
+import { OrderController } from '../controllers/order.controller';
+import { OrderService } from '../../../application/order.service';
+import { PrismaOrderRepository } from '../../persistence/prisma-order.repository';
+import { authenticate, requireRole } from '../../../../../middleware/auth';
 
 const router: Router = Router();
 

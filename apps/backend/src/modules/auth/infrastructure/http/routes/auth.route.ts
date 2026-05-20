@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { AuthController } from '../controllers/auth.controller.js';
-import { AuthService } from '../../../application/auth.service.js';
-import { PrismaUserRepository } from '../../persistence/prisma-user.repository.js';
-import { authenticate } from '../../../../../middleware/auth.js';
+import { AuthController } from '../controllers/auth.controller';
+import { AuthService } from '../../../application/auth.service';
+import { PrismaUserRepository } from '../../persistence/prisma-user.repository';
+import { authenticate } from '../../../../../middleware/auth';
 
 const router: Router = Router();
 
