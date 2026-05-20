@@ -30,3 +30,14 @@ export async function seedDatabase() {
 
   console.log('✅ Seeding check complete.');
 }
+
+if (require.main === module) {
+  seedDatabase()
+    .catch((e) => {
+      console.error('❌ Error during seeding:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
