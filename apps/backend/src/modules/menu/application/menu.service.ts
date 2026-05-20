@@ -1,4 +1,4 @@
-import { MenuItemRepository } from '../domain/menu-item.repository.js';
+import { MenuItemRepository } from '../domain/menu-item.repository';
 
 
 export class MenuService {

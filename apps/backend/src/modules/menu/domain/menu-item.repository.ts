@@ -1,4 +1,4 @@
-import { MenuItemEntity } from './menu-item.entity.js';
+import { MenuItemEntity } from './menu-item.entity';
 
 export interface MenuItemRepository {
   findAll(): Promise<MenuItemEntity[]>;

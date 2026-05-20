@@ -1,4 +1,4 @@
-import { OrderEntity } from './order.entity.js';
+import { OrderEntity } from './order.entity';
 
 export interface OrderRepository {
   findAll(): Promise<OrderEntity[]>;

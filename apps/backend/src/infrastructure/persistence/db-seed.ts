@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import prisma from './prisma.client.js';
+import prisma from './prisma.client';
 
 export async function seedDatabase() {
   console.log('🌱 Checking for seed data...');

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import prisma from '../../../infrastructure/persistence/prisma.client.js';
+import prisma from '../../../infrastructure/persistence/prisma.client';
 
 export class UsersService {
   async createWorker(data: any) {

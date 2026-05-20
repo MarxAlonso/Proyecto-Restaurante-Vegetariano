@@ -1,4 +1,4 @@
-import { OrderRepository } from '../domain/order.repository.js';
+import { OrderRepository } from '../domain/order.repository';
 
 export class OrderService {
   constructor(private orderRepository: OrderRepository) {}

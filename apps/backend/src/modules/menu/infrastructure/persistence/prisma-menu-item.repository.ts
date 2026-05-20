@@ -1,6 +1,6 @@
-import { MenuItemRepository } from '../../domain/menu-item.repository.js';
-import { MenuItemEntity } from '../../domain/menu-item.entity.js';
-import prisma from '../../../../infrastructure/persistence/prisma.client.js';
+import { MenuItemRepository } from '../../domain/menu-item.repository';
+import { MenuItemEntity } from '../../domain/menu-item.entity';
+import prisma from '../../../../infrastructure/persistence/prisma.client';
 
 export class PrismaMenuItemRepository implements MenuItemRepository {
   async findAll(): Promise<MenuItemEntity[]> {
