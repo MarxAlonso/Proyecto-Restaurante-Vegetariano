@@ -1,6 +1,6 @@
-import { OrderRepository } from '../../domain/order.repository.js';
-import { OrderEntity } from '../../domain/order.entity.js';
-import prisma from '../../../../infrastructure/persistence/prisma.client.js';
+import { OrderRepository } from '../../domain/order.repository';
+import { OrderEntity } from '../../domain/order.entity';
+import prisma from '../../../../infrastructure/persistence/prisma.client';
 
 export class PrismaOrderRepository implements OrderRepository {
   async findAll(): Promise<OrderEntity[]> {
@@ -98,7 +98,7 @@ export class PrismaOrderRepository implements OrderRepository {
       CANCELLED: 0,
     };
 
-    counts.forEach((item) => {
+    counts.forEach((item: { status: string; _count: { _all: number } }) => {
       stats[item.status] = item._count._all;
     });
 
