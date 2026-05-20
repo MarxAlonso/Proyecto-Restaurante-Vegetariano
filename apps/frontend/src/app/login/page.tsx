@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { fetchApi } from "@/lib/api";
 
@@ -27,24 +28,9 @@ export default function LoginPage() {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const loadGoogleScript = () => {
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        setGoogleLoaded(true);
-      };
-      document.body.appendChild(script);
-    };
-
-    if (!window.google) {
-      loadGoogleScript();
-    } else {
-      setGoogleLoaded(true);
-    }
-  }, []);
+  const handleGoogleScriptLoad = () => {
+    setGoogleLoaded(true);
+  };
 
   useEffect(() => {
     if (googleLoaded && window.google) {
@@ -230,6 +216,11 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        onLoad={handleGoogleScriptLoad}
+        strategy="lazyOnload"
+      />
     </div>
   );
 }
