@@ -1,7 +1,10 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserRepository } from '../domain/user.repository.js';
-import { UserEntity } from '../domain/user.entity.js';
+import { OAuth2Client } from 'google-auth-library';
+import { UserRepository } from '../domain/user.repository';
+import { UserEntity } from '../domain/user.entity';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export class AuthService {
   constructor(private userRepository: UserRepository) {}
@@ -36,6 +39,34 @@ export class AuthService {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       throw new Error('Invalid credentials');
+    }
+
+    const token = this.generateToken(user);
+    return { user: this.sanitizeUser(user), token };
+  }
+
+  async googleLogin(credential: string) {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload?.email) {
+      throw new Error('Invalid Google credentials');
+    }
+
+    const email = payload.email;
+    const name = payload.name || email.split('@')[0];
+
+    let user = await this.userRepository.findByEmail(email);
+
+    if (!user) {
+      user = await this.userRepository.save({
+        email,
+        name,
+        role: 'CLIENT', // Google users are automatically CLIENTs
+      });
     }
 
     const token = this.generateToken(user);

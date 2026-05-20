@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../../../application/auth.service.js';
+import { AuthService } from '../../../application/auth.service';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -25,6 +25,24 @@ export class AuthController {
     try {
       const { email, password } = req.body;
       const result = await this.authService.login(email, password);
+
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      res.status(401).json({ error: error.message });
+    }
+  }
+
+  async googleLogin(req: Request, res: Response) {
+    try {
+      const { credential } = req.body;
+      const result = await this.authService.googleLogin(credential);
 
       res.cookie('token', result.token, {
         httpOnly: true,

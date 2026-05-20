@@ -12,6 +12,7 @@ const authController = new AuthController(authService);
 
 router.post('/register', (req, res) => authController.register(req, res));
 router.post('/login', (req, res) => authController.login(req, res));
+router.post('/google', (req, res) => authController.googleLogin(req, res));
 router.post('/logout', (req, res) => authController.logout(req, res));
 router.get('/me', authenticate, (req, res) => authController.me(req, res));
 

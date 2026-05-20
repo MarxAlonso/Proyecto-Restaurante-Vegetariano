@@ -1,6 +1,6 @@
-import { UserRepository } from '../../domain/user.repository.js';
-import { UserEntity } from '../../domain/user.entity.js';
-import prisma from '../../../../infrastructure/persistence/prisma.client.js';
+import { UserRepository } from '../../domain/user.repository';
+import { UserEntity } from '../../domain/user.entity';
+import prisma from '../../../../infrastructure/persistence/prisma.client';
 
 export class PrismaUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<UserEntity | null> {
@@ -18,14 +18,15 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async save(user: Omit<UserEntity, 'id' | 'createdAt'>): Promise<UserEntity> {
-    const createdUser = await prisma.user.create({
-      data: {
-        email: user.email,
-        password: user.password!,
-        name: user.name,
-        role: user.role,
-      },
-    });
+    const data: any = {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+    if (user.password) {
+      data.password = user.password;
+    }
+    const createdUser = await prisma.user.create({ data });
     return createdUser as UserEntity;
   }
 }
