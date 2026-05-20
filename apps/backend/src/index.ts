@@ -16,10 +16,14 @@ import { seedDatabase } from './infrastructure/persistence/db-seed.js';
 
 dotenv.config();
 
-// Seed database on startup
-seedDatabase().catch(err => {
-  console.error('❌ Error during seeding:', err);
-});
+const isVercelServerless = process.env.VERCEL === '1';
+
+if (!isVercelServerless) {
+  // Seed the database only when running a dedicated server instance locally or in a non-serverless environment.
+  seedDatabase().catch(err => {
+    console.error('❌ Error during seeding:', err);
+  });
+}
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
@@ -61,8 +65,10 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+if (!isVercelServerless) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
 
 export default app;
