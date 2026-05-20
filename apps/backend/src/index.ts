@@ -45,15 +45,23 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://restaurante-vegetariano-frontend.vercel.app'
+    ];
+    const cleanedOrigin = origin?.replace(/\/$/, '') || '';
+    if (allowedOrigins.includes(cleanedOrigin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
 app.use(express.json());
 app.use(cookieParser());
-
-// Static files
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Ruta raíz
 app.get('/', (_req, res) => {

@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { MenuService } from '../../../application/menu.service';
 
-const isVercel = process.env.VERCEL === '1';
-
 export class MenuController {
   constructor(private menuService: MenuService) {}
 
@@ -27,10 +25,6 @@ export class MenuController {
   async create(req: Request, res: Response) {
     try {
       const data = { ...req.body };
-      if (req.file && !isVercel) {
-        data.image = `/uploads/${req.file.filename}`;
-      }
-      
       const item = await this.menuService.createItem(data);
       res.status(201).json(item);
     } catch (error: any) {
@@ -41,10 +35,6 @@ export class MenuController {
   async update(req: Request, res: Response) {
     try {
       const data = { ...req.body };
-      if (req.file && !isVercel) {
-        data.image = `/uploads/${req.file.filename}`;
-      }
-
       const item = await this.menuService.updateItem(req.params.id as string, data);
       res.json(item);
     } catch (error: any) {
