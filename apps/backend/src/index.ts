@@ -7,12 +7,12 @@ import rateLimit from 'express-rate-limit';
 
 import path from 'path';
 
-import authRoutes from './modules/auth/infrastructure/http/routes/auth.route.js';
-import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route.js';
-import orderRoutes from './modules/order/infrastructure/http/routes/order.route.js';
-import usersRoutes from './modules/users/infrastructure/http/routes/users.route.js';
+import authRoutes from './modules/auth/infrastructure/http/routes/auth.route';
+import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route';
+import orderRoutes from './modules/order/infrastructure/http/routes/order.route';
+import usersRoutes from './modules/users/infrastructure/http/routes/users.route';
 
-import { seedDatabase } from './infrastructure/persistence/db-seed.js';
+import { seedDatabase } from './infrastructure/persistence/db-seed';
 
 dotenv.config();
 
@@ -54,6 +54,22 @@ app.use(cookieParser());
 
 // Static files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// Ruta raíz
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'Restaurant Veg Backend API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      menu: '/api/menu',
+      orders: '/api/orders',
+      users: '/api/users'
+    }
+  });
+});
 
 // Modular Routes
 app.use('/api/auth', authRoutes);
