@@ -8,7 +8,7 @@ import {
   History,
   LogOut 
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const MENU_ITEMS = [
   { icon: ListTodo, label: "Pedidos Pendientes", href: "/panelkitchen" },

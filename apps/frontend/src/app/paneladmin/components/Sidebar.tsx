@@ -9,7 +9,7 @@ import {
   Settings,
   LogOut 
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const MENU_ITEMS = [
   { icon: BarChart3, label: "Dashboard", href: "/paneladmin" },

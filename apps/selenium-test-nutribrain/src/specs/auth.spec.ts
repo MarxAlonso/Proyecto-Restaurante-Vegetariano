@@ -62,11 +62,11 @@ describe('Pruebas de Autenticación y Autorización - RESTVEG', () => {
 
     // 4. Verificar la visualización correcta de los datos del panel (Dashboard del Cliente)
     const headerTitleElement = await driver.wait(
-      until.elementLocated(By.xpath("//h1[contains(text(), '¡Hola, Marx!')]")),
+      until.elementLocated(By.xpath("//h1[contains(text(), '¡Hola, Client!')]")),
       10000
     );
     const headerTitle = await headerTitleElement.getText();
-    expect(headerTitle).toContain('¡Hola, Marx!');
+    expect(headerTitle).toContain('¡Hola, Client!');
 
     const pointsCard = await driver.findElement(By.xpath("//p[contains(text(), 'Puntos Veg')]"));
     expect(await pointsCard.isDisplayed()).toBe(true);

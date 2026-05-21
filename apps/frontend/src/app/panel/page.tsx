@@ -1,4 +1,7 @@
+'use client';
+
 import { ShoppingBag, Clock, Star, TrendingUp } from "lucide-react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const STATS = [
   { label: "Pedidos Totales", value: "12", icon: ShoppingBag, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/20" },
@@ -8,10 +11,13 @@ const STATS = [
 ];
 
 export default function ClientDashboard() {
+  const { user } = useAuth();
+  const userName = user?.name?.split(' ')[0] || 'Usuario';
+
   return (
     <div className="space-y-8 transition-colors">
       <div>
-        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">¡Hola, Marx! 👋</h1>
+        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">¡Hola, {userName}! 👋</h1>
         <p className="text-zinc-500 dark:text-zinc-400">Aquí tienes un resumen de tus pedidos y actividad.</p>
       </div>
 

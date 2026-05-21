@@ -1,7 +1,10 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function Header() {
+  const { user, logout } = useAuth();
+  
   return (
     <header className="h-16 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-8 transition-colors">
       <div className="flex items-center gap-4">
@@ -18,12 +21,19 @@ export default function Header() {
         
         <div className="flex items-center gap-3 border-l border-zinc-200 dark:border-zinc-800 pl-4">
           <div className="text-right">
-            <p className="text-sm font-semibold text-zinc-900 dark:text-white">Administrador</p>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white">{user?.name}</p>
             <p className="text-[10px] text-primary font-bold uppercase">Super Admin</p>
           </div>
           <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-white font-bold">
-            AD
+            {user?.name?.charAt(0)?.toUpperCase() || "A"}
           </div>
+          <button
+            onClick={logout}
+            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-full transition-colors text-red-600 dark:text-red-400"
+            title="Cerrar sesión"
+          >
+            <LogOut size={20} />
+          </button>
         </div>
       </div>
     </header>

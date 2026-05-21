@@ -7,6 +7,7 @@ import chrome from 'selenium-webdriver/chrome.js';
  * pero permite redefinirse mediante la variable de entorno TARGET_URL.
  */
 export const BASE_URL = process.env.TARGET_URL || 'http://localhost:3000';
+export const API_URL = process.env.API_URL || 'http://localhost:3002';
 
 /**
  * Inicializa y configura una instancia limpia de Selenium WebDriver para Google Chrome.

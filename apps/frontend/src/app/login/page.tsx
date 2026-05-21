@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { fetchApi } from "@/lib/api";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 declare global {
   interface Window {
@@ -27,6 +28,20 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const router = useRouter();
+  const { login, user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      const role = user.role;
+      if (role === "ADMIN") {
+        router.replace("/paneladmin");
+      } else if (role === "KITCHEN") {
+        router.replace("/panelkitchen");
+      } else {
+        router.replace("/panel");
+      }
+    }
+  }, [user, router]);
 
   const handleGoogleScriptLoad = () => {
     setGoogleLoaded(true);
@@ -63,11 +78,11 @@ export default function LoginPage() {
 
       const role = data.user.role;
       if (role === "ADMIN") {
-        router.push("/paneladmin");
+        router.replace("/paneladmin");
       } else if (role === "KITCHEN") {
-        router.push("/panelkitchen");
+        router.replace("/panelkitchen");
       } else {
-        router.push("/panel");
+        router.replace("/panel");
       }
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión con Google");
@@ -82,22 +97,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const data = await fetchApi("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      const role = data.user.role;
-      if (role === "ADMIN") {
-        router.push("/paneladmin");
-      } else if (role === "KITCHEN") {
-        router.push("/panelkitchen");
-      } else {
-        router.push("/panel");
-      }
+      await login({ email, password });
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión");
     } finally {

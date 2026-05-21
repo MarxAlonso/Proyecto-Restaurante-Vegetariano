@@ -12,6 +12,7 @@
     "test:playwright": "pnpm --filter restaurant-veg exec playwright test",
     "test:playwright:ui": "pnpm --filter restaurant-veg exec playwright test --ui",
     "test:backend": "pnpm --filter restaurant-veg-backend test",
+    "test:backend:testenv": "cross-env NODE_ENV=test PORT=3002 pnpm --filter restaurant-veg-backend start",
     "test:all": "pnpm test:backend && pnpm test:selenium && pnpm test:playwright"
   },
   "devDependencies": {

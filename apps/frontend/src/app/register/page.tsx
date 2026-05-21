@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { fetchApi } from "@/lib/api";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -14,6 +15,20 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { user, login } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      const role = user.role;
+      if (role === "ADMIN") {
+        router.replace("/paneladmin");
+      } else if (role === "KITCHEN") {
+        router.replace("/panelkitchen");
+      } else {
+        router.replace("/panel");
+      }
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,11 +57,11 @@ export default function RegisterPage() {
 
       const role = data.user.role;
       if (role === "ADMIN") {
-        router.push("/paneladmin");
+        router.replace("/paneladmin");
       } else if (role === "KITCHEN") {
-        router.push("/panelkitchen");
+        router.replace("/panelkitchen");
       } else {
-        router.push("/panel");
+        router.replace("/panel");
       }
     } catch (err: any) {
       setError(err.message || "Error al registrarse");

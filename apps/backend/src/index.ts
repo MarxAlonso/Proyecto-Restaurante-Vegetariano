@@ -17,8 +17,9 @@ import { seedDatabase } from './infrastructure/persistence/db-seed';
 dotenv.config();
 
 const isVercelServerless = process.env.VERCEL === '1';
+const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
 
-if (!isVercelServerless) {
+if (!isVercelServerless && !isTestEnvironment) {
   // Seed the database only when running a dedicated server instance locally or in a non-serverless environment.
   seedDatabase().catch(err => {
     console.error('❌ Error during seeding:', err);
@@ -26,14 +27,14 @@ if (!isVercelServerless) {
 }
 
 const app: Application = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'test' ? 3002 : 3001);
 
 // Middlewares de Seguridad
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Permite cargar imágenes desde otro origen (Frontend)
 }));
 
-const limiter = rateLimit({
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // Límite de 100 peticiones por IP cada 15 minutos
   message: { error: 'Demasiadas peticiones desde esta IP, por favor intente de nuevo más tarde.' },
@@ -41,8 +42,19 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Aplicar rate limiting solo a rutas de API
-app.use('/api', limiter);
+const authLimiter = rateLimit({
+  windowMs: 1000, // 1 segundo
+  max: 100, // Límite de 100 peticiones por IP por segundo para rutas de autenticación (login, register, google)
+  message: { error: 'Demasiados intentos de autenticación desde esta IP, por favor intente de nuevo más tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipFailedRequests: false,
+  skipSuccessfulRequests: false,
+  skip: () => process.env.NODE_ENV === 'test',
+});
+
+// Aplicar rate limiting general a todas las rutas de API
+app.use('/api', generalLimiter);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -79,8 +91,8 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Modular Routes
-app.use('/api/auth', authRoutes);
+// Modular Routes con rate limit específico para auth
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', usersRoutes);
@@ -89,7 +101,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-if (!isVercelServerless) {
+if (!isVercelServerless && !isTestEnvironment) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
