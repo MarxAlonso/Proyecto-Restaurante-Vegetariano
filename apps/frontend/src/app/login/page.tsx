@@ -211,7 +211,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-zinc-500">
           ¿No tienes una cuenta?{" "}
-          <Link href="#" className="text-primary hover:underline font-bold">
+          <Link href="/register" className="text-primary hover:underline font-bold">
             Regístrate aquí
           </Link>
         </p>
