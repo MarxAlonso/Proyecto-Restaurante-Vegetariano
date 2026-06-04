@@ -24,8 +24,8 @@ export class MenuController {
 
   async create(req: Request, res: Response) {
     try {
-      const data = { ...req.body };
-      const item = await this.menuService.createItem(data);
+      const file = req.file;
+      const item = await this.menuService.createItem(req.body, file);
       res.status(201).json(item);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -34,8 +34,8 @@ export class MenuController {
 
   async update(req: Request, res: Response) {
     try {
-      const data = { ...req.body };
-      const item = await this.menuService.updateItem(req.params.id as string, data);
+      const file = req.file;
+      const item = await this.menuService.updateItem(req.params.id as string, req.body, file);
       res.json(item);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

@@ -9,8 +9,10 @@ import path from 'path';
 
 import authRoutes from './modules/auth/infrastructure/http/routes/auth.route';
 import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route';
+import categoryRoutes from './modules/categories/infrastructure/http/routes/category.route';
 import orderRoutes from './modules/order/infrastructure/http/routes/order.route';
 import usersRoutes from './modules/users/infrastructure/http/routes/users.route';
+import paymentsRoutes from './modules/payments/infrastructure/http/routes/payments.route';
 
 import { seedDatabase } from './infrastructure/persistence/db-seed';
 
@@ -85,8 +87,10 @@ app.get('/', (_req, res) => {
       health: '/api/health',
       auth: '/api/auth',
       menu: '/api/menu',
+      categories: '/api/categories',
       orders: '/api/orders',
-      users: '/api/users'
+      users: '/api/users',
+      payments: '/api/payments'
     }
   });
 });
@@ -94,8 +98,10 @@ app.get('/', (_req, res) => {
 // Modular Routes con rate limit específico para auth
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/menu', menuRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

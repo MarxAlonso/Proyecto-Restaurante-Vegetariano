@@ -17,7 +17,7 @@ Error: expect(locator).toBeVisible() failed
 Locator: locator('.title-main')
 Expected: visible
 Error: strict mode violation: locator('.title-main') resolved to 2 elements:
-    1) <h1 class="title-main text-white mb-6">…</h1> aka getByRole('heading', { name: 'Sabor Natural & Parrilla' })
+    1) <a href="/" class="title-main text-white mb-6 text-6xl">…</a> aka getByRole('link', { name: 'Sabor Natural & Parrilla' })
     2) <h2 class="title-main mb-4 text-zinc-900 dark:text-white">Platos Destacados</h2> aka getByRole('heading', { name: 'Platos Destacados' })
 
 Call log:
@@ -53,7 +53,8 @@ Call log:
             - /url: /reservar
     - main [ref=e18]:
       - generic [ref=e22]:
-        - heading "Sabor Natural & Parrilla Premium" [level=1] [ref=e23]
+        - link "Sabor Natural & Parrilla Premium" [ref=e23] [cursor=pointer]:
+          - /url: /
         - paragraph [ref=e24]: Descubre la fusión perfecta entre la frescura vegetal y el ahumado inconfundible de nuestra parrilla. Una experiencia gastronómica única en el corazón de la ciudad.
         - generic [ref=e25]:
           - link "Ver Menú" [ref=e26] [cursor=pointer]:
@@ -165,8 +166,13 @@ Call log:
             - listitem [ref=e141]: info@restaurantveg.com
       - paragraph [ref=e143]: © 2024 Restaurant Veg. Todos los derechos reservados.
   - button "Open Next.js Dev Tools" [ref=e149] [cursor=pointer]:
-    - img [ref=e150]
-  - alert [ref=e153]
+    - generic [ref=e152]:
+      - text: Compiling
+      - generic [ref=e153]:
+        - generic [ref=e154]: .
+        - generic [ref=e155]: .
+        - generic [ref=e156]: .
+  - alert [ref=e157]
 ```
 
 # Test source

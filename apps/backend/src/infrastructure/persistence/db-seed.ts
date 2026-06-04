@@ -1,9 +1,22 @@
 import bcrypt from 'bcryptjs';
 import prisma from './prisma.client';
 
+const DEFAULT_CATEGORIES = [
+  { name: 'Entrantes', slug: 'entrantes', description: 'Aperitivos y entrantes ligeros' },
+  { name: 'Ensaladas', slug: 'ensaladas', description: 'Ensaladas frescas y saludables' },
+  { name: 'Platos Principales', slug: 'platos-principales', description: 'Platos principales vegetarianos' },
+  { name: 'Parrillas', slug: 'parrillas', description: 'Cortes premium a la parrilla' },
+  { name: 'Pollos', slug: 'pollos', description: 'Especialidades de pollo' },
+  { name: 'Carnes', slug: 'carnes', description: 'Cortes de carne seleccionados' },
+  { name: 'Postres', slug: 'postres', description: 'Postres y dulces artesanales' },
+  { name: 'Bebidas', slug: 'bebidas', description: 'Bebidas y refrescos' },
+  { name: 'Bebidas Alcohólicas', slug: 'bebidas-alcoholicas', description: 'Cervezas, vinos y licores' },
+];
+
 export async function seedDatabase() {
   console.log('🌱 Checking for seed data...');
 
+  // Seed users
   const roles = ['ADMIN', 'KITCHEN', 'CLIENT'] as const;
   
   for (const role of roles) {
@@ -25,6 +38,15 @@ export async function seedDatabase() {
           role: role,
         },
       });
+    }
+  }
+
+  // Seed default categories
+  for (const cat of DEFAULT_CATEGORIES) {
+    const existing = await prisma.category.findUnique({ where: { slug: cat.slug } });
+    if (!existing) {
+      console.log(`📁 Creating category: ${cat.name}`);
+      await prisma.category.create({ data: cat });
     }
   }
 

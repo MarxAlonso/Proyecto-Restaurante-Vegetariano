@@ -22,7 +22,7 @@ Timeout:  5000ms
 Call log:
   - Expect "toHaveAttribute" with timeout 5000ms
   - waiting for locator('a:has-text("Reservar Mesa")')
-    14 × locator resolved to <a href="/reservar" class="btn-secondary text-center">Reservar Mesa</a>
+    13 × locator resolved to <a href="/reservar" class="btn-secondary text-center">Reservar Mesa</a>
        - unexpected value "/reservar"
 
 ```

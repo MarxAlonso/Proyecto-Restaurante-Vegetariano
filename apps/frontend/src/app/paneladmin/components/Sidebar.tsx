@@ -7,7 +7,9 @@ import {
   ClipboardList, 
   Users, 
   Settings,
-  LogOut 
+  LogOut,
+  ChefHat,
+  Tags
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -15,7 +17,9 @@ const MENU_ITEMS = [
   { icon: BarChart3, label: "Dashboard", href: "/paneladmin" },
   { icon: ClipboardList, label: "Pedidos", href: "/paneladmin/pedidos" },
   { icon: Package, label: "Productos", href: "/paneladmin/productos" },
+  { icon: Tags, label: "Categorías", href: "/paneladmin/categorias" },
   { icon: Users, label: "Clientes", href: "/paneladmin/clientes" },
+  { icon: ChefHat, label: "Empleados", href: "/paneladmin/empleados" },
   { icon: Settings, label: "Configuración", href: "/paneladmin/configuracion" },
 ];
 

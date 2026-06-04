@@ -12,44 +12,71 @@
 # Error details
 
 ```
-Error: expect(page).toHaveURL(expected) failed
+Error: expect(locator).toBeVisible() failed
 
-Expected pattern: /\/panel$/
-Received string:  "http://localhost:3000/login"
+Locator: locator('h1:has-text("¡Hola, Marx!")')
+Expected: visible
 Timeout: 5000ms
+Error: element(s) not found
 
 Call log:
-  - Expect "toHaveURL" with timeout 5000ms
-    13 × unexpected value "http://localhost:3000/login"
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('h1:has-text("¡Hola, Marx!")')
 
 ```
 
 ```yaml
-- button "Toggle theme"
-- link "RESTAURANTVEG":
-  - /url: /
-- heading "¡Bienvenido de nuevo!" [level=2]
-- paragraph: Ingresa a tu cuenta para continuar.
-- text: Correo Electrónico
-- textbox "Correo Electrónico":
-  - /placeholder: nombre@ejemplo.com
-  - text: client@restveg.com
-- text: Contraseña
-- link "¿Olvidaste tu contraseña?":
-  - /url: "#"
-- textbox "Contraseña":
-  - /placeholder: ••••••••
-  - text: client123
-- button "Iniciar Sesión"
-- text: O continuar con
-- button "Continuar con Google":
-  - img
-  - text: Continuar con Google
-- paragraph:
-  - text: ¿No tienes una cuenta?
-  - link "Regístrate aquí":
-    - /url: /register
 - alert
+- complementary:
+  - link "RESTAURANTVEG":
+    - /url: /
+  - navigation:
+    - link "Dashboard":
+      - /url: /panel
+    - link "Mis Pedidos":
+      - /url: /panel/pedidos
+    - link "Historial":
+      - /url: /panel/historial
+    - link "Perfil":
+      - /url: /panel/perfil
+  - button "Cerrar Sesión"
+- banner:
+  - textbox "Buscar platos, pedidos..."
+  - button "Toggle theme"
+  - button
+  - paragraph: Client User
+  - paragraph: Cliente
+  - text: C
+  - button "Cerrar sesión"
+- main:
+  - heading "¡Hola, Client! 👋" [level=1]
+  - paragraph: Aquí tienes un resumen de tus pedidos y actividad.
+  - paragraph: Pedidos Totales
+  - paragraph: "12"
+  - paragraph: En Camino
+  - paragraph: "1"
+  - paragraph: Puntos Veg
+  - paragraph: "450"
+  - paragraph: Ahorro Mensual
+  - paragraph: S/ 85
+  - heading "Pedidos Recientes" [level=2]
+  - button "Ver todo"
+  - paragraph: "Pedido #ORD-1001"
+  - paragraph: 20 de Abril, 2024 • 3 items
+  - paragraph: S/ 54.00
+  - text: Entregado
+  - paragraph: "Pedido #ORD-1002"
+  - paragraph: 20 de Abril, 2024 • 3 items
+  - paragraph: S/ 54.00
+  - text: Entregado
+  - paragraph: "Pedido #ORD-1003"
+  - paragraph: 20 de Abril, 2024 • 3 items
+  - paragraph: S/ 54.00
+  - text: Entregado
+  - heading "Favoritos" [level=2]
+  - paragraph: Hamburguesa Veggie
+  - paragraph: Has pedido este plato 5 veces este mes.
+  - button "Pedir de nuevo"
 ```
 
 # Test source
@@ -90,12 +117,12 @@ Call log:
   33 |     await page.click('button[type="submit"]');
   34 | 
   35 |     // 2. Esperar redirección y verificar la URL
-> 36 |     await expect(page).toHaveURL(/\/panel$/);
-     |                        ^ Error: expect(page).toHaveURL(expected) failed
+  36 |     await expect(page).toHaveURL(/\/panel$/);
   37 | 
   38 |     // 3. Verificar elementos en la interfaz del cliente
   39 |     const greeting = page.locator('h1:has-text("¡Hola, Marx!")');
-  40 |     await expect(greeting).toBeVisible();
+> 40 |     await expect(greeting).toBeVisible();
+     |                            ^ Error: expect(locator).toBeVisible() failed
   41 | 
   42 |     const pointsCard = page.locator('p:has-text("Puntos Veg")');
   43 |     await expect(pointsCard).toBeVisible();

@@ -6,4 +6,5 @@ export interface MenuItemRepository {
   save(item: Omit<MenuItemEntity, 'id' | 'createdAt'>): Promise<MenuItemEntity>;
   update(id: string, item: Partial<MenuItemEntity>): Promise<MenuItemEntity>;
   delete(id: string): Promise<void>;
+  findCategoryIdBySlug(slug: string): Promise<string | null>;
 }

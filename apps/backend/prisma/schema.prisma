@@ -8,13 +8,28 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String             @id @default(uuid())
+  email     String             @unique
   password  String?
   name      String
-  role      Role     @default(CLIENT)
-  createdAt DateTime @default(now())
+  role      Role               @default(CLIENT)
+  salary    Decimal?           @db.Decimal(10, 2)
+  createdAt DateTime           @default(now())
   orders    Order[]
+  payments  EmployeePayment[]
+}
+
+model EmployeePayment {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  paymentDate DateTime
+  month       Int
+  year        Int
+  createdAt   DateTime @default(now())
+
+  @@index([userId, year, month])
 }
 
 enum Role {
@@ -23,23 +38,26 @@ enum Role {
   KITCHEN
 }
 
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  menuItems   MenuItem[]
+}
+
 model MenuItem {
   id          String       @id @default(uuid())
   name        String
   description String
   price       Decimal      @db.Decimal(10, 2)
-  category    Category
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id])
   image       String?
   available   Boolean      @default(true)
   createdAt   DateTime     @default(now())
   orderItems  OrderItem[]
-}
-
-enum Category {
-  APPETIZER
-  MAIN
-  DESSERT
-  DRINK
 }
 
 model Order {
