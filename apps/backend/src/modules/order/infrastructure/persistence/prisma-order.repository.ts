@@ -5,10 +5,10 @@ import prisma from '../../../../infrastructure/persistence/prisma.client';
 export class PrismaOrderRepository implements OrderRepository {
   async findAll(): Promise<OrderEntity[]> {
     const orders = await prisma.order.findMany({
-      include: { 
+      include: {
         items: {
-          include: { menuItem: true }
-        }
+          include: { menuItem: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -27,10 +27,10 @@ export class PrismaOrderRepository implements OrderRepository {
   async findById(id: string): Promise<OrderEntity | null> {
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { 
+      include: {
         items: {
-          include: { menuItem: true }
-        }
+          include: { menuItem: true },
+        },
       },
     });
     return order as any as OrderEntity | null;
@@ -43,6 +43,11 @@ export class PrismaOrderRepository implements OrderRepository {
         status: data.status,
         total: data.total,
         notes: data.notes,
+        orderType: data.orderType || 'DINE_IN',
+        paymentStatus: data.paymentStatus || 'PENDING',
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
         items: {
           create: data.items.map((item: any) => ({
             menuItemId: item.menuItemId,
@@ -65,6 +70,35 @@ export class PrismaOrderRepository implements OrderRepository {
     return updated as any as OrderEntity;
   }
 
+  async updatePaymentStatus(id: string, paymentStatus: string, paymentId: string): Promise<OrderEntity> {
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        paymentStatus: paymentStatus as any,
+        mercadoPagoPaymentId: paymentId,
+      },
+      include: { items: true },
+    });
+    return updated as any as OrderEntity;
+  }
+
+  async updateMercadoPagoPreference(id: string, preferenceId: string): Promise<OrderEntity> {
+    const updated = await prisma.order.update({
+      where: { id },
+      data: { mercadoPagoPreferenceId: preferenceId },
+      include: { items: true },
+    });
+    return updated as any as OrderEntity;
+  }
+
+  async findByPreferenceId(preferenceId: string): Promise<OrderEntity | null> {
+    const order = await prisma.order.findFirst({
+      where: { mercadoPagoPreferenceId: preferenceId },
+      include: { items: true },
+    });
+    return order as any as OrderEntity | null;
+  }
+
   async findKitchenOrders(): Promise<OrderEntity[]> {
     const orders = await prisma.order.findMany({
       where: {
@@ -72,10 +106,10 @@ export class PrismaOrderRepository implements OrderRepository {
           in: ['PENDING', 'PREPARING', 'READY'],
         },
       },
-      include: { 
+      include: {
         items: {
-          include: { menuItem: true }
-        }
+          include: { menuItem: true },
+        },
       },
       orderBy: { createdAt: 'asc' },
     });

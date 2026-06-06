@@ -12,6 +12,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 
 const MENU_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/panel" },
+  { icon: ShoppingBag, label: "Nuevo Pedido", href: "/panel/checkout" },
   { icon: ShoppingBag, label: "Mis Pedidos", href: "/panel/pedidos" },
   { icon: History, label: "Historial", href: "/panel/historial" },
   { icon: User, label: "Perfil", href: "/panel/perfil" },

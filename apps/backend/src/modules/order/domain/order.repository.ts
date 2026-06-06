@@ -8,4 +8,7 @@ export interface OrderRepository {
   updateStatus(id: string, status: string): Promise<OrderEntity>;
   findKitchenOrders(): Promise<OrderEntity[]>;
   countByStatus(): Promise<Record<string, number>>;
+  updatePaymentStatus(id: string, paymentStatus: string, paymentId: string): Promise<OrderEntity>;
+  updateMercadoPagoPreference(id: string, preferenceId: string): Promise<OrderEntity>;
+  findByPreferenceId(preferenceId: string): Promise<OrderEntity | null>;
 }

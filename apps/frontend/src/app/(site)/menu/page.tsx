@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fetchApi } from "@/lib/api";
+import { useCart } from "@/components/providers/CartProvider";
 
 interface MenuItem {
   id: string;
@@ -52,6 +53,7 @@ export default function MenuPage() {
   const [selectedCat, setSelectedCat] = useState("todas");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const { addItem } = useCart();
 
   useEffect(() => {
     Promise.all([
@@ -80,8 +82,8 @@ export default function MenuPage() {
     setPage(1);
   };
 
-  const formatPrice = (price: number) => {
-    return `S/ ${price.toFixed(2)}`;
+  const formatPrice = (price: number | string) => {
+    return `S/ ${Number(price).toFixed(2)}`;
   };
 
   return (
@@ -148,53 +150,59 @@ export default function MenuPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[600px]">
               <AnimatePresence mode="popLayout">
                 {paginatedItems.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="card group"
-                  >
-                    <div className="relative h-56 overflow-hidden">
-                      {item.image ? (
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                          <ImageIcon className="w-12 h-12 text-zinc-400" />
-                        </div>
-                      )}
-                      {item.category && (
-                        <div className={cn(
-                          "absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1 uppercase tracking-wider",
-                          getCategoryColor(item.category.slug)
-                        )}>
-                          {getCategoryIcon(item.category.slug)}
-                          {item.category.name}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                          {item.name}
-                        </h3>
-                        <span className="text-primary font-bold">{formatPrice(item.price)}</span>
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4, delay: idx * 0.05, ease: [0.23, 1, 0.32, 1] }}
+                      className="bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-100 dark:border-zinc-800/50 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] overflow-hidden group flex flex-col hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_40px_rgb(0,0,0,0.2)] transition-all duration-500"
+                    >
+                      <div className="relative h-56 overflow-hidden flex-shrink-0">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center">
+                            <ImageIcon className="w-12 h-12 text-zinc-300 dark:text-zinc-600" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {item.category && (
+                          <div className={cn(
+                            "absolute top-4 left-4 px-3 py-1.5 rounded-xl text-[12px] font-bold text-white flex items-center gap-1.5 backdrop-blur-md shadow-sm",
+                            getCategoryColor(item.category.slug) === "bg-primary" ? "bg-primary/90" : "bg-secondary/90"
+                          )}>
+                            {getCategoryIcon(item.category.slug)}
+                            {item.category.name}
+                          </div>
+                        )}
                       </div>
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6 line-clamp-2">
-                        {item.description}
-                      </p>
-                      <button className="w-full btn-primary !py-2.5 flex items-center justify-center gap-2">
-                        <ShoppingCart className="w-4 h-4" />
-                        Añadir al Pedido
-                      </button>
-                    </div>
-                  </motion.div>
+                      <div className="p-6 flex flex-col flex-1">
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-4 mb-2">
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white leading-tight">
+                              {item.name}
+                            </h3>
+                            <span className="text-primary font-black text-lg whitespace-nowrap bg-primary/10 dark:bg-primary/20 px-3 py-1 rounded-xl">{formatPrice(item.price)}</span>
+                          </div>
+                          <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed line-clamp-3">
+                            {item.description}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => addItem({ id: item.id, name: item.name, price: Number(item.price), image: item.image })}
+                          className="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold rounded-xl hover:bg-primary dark:hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2 group/btn"
+                        >
+                          <ShoppingCart className="w-5 h-5 transition-transform group-hover/btn:scale-110" />
+                          Agregar al pedido
+                        </button>
+                      </div>
+                    </motion.div>
                 ))}
               </AnimatePresence>
             </div>

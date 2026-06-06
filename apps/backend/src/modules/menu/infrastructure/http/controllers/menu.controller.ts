@@ -4,10 +4,22 @@ import { MenuService } from '../../../application/menu.service';
 export class MenuController {
   constructor(private menuService: MenuService) {}
 
+  private serializeItem(item: any) {
+    if (!item) return null;
+    return {
+      ...item,
+      price: Number(item.price),
+    };
+  }
+
+  private serializeItems(items: any[]) {
+    return items.map(item => this.serializeItem(item));
+  }
+
   async getAll(req: Request, res: Response) {
     try {
       const items = await this.menuService.getAllItems();
-      res.json(items);
+      res.json(this.serializeItems(items));
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -16,7 +28,8 @@ export class MenuController {
   async getById(req: Request, res: Response) {
     try {
       const item = await this.menuService.getItemById(req.params.id as string);
-      res.json(item);
+      if (!item) return res.status(404).json({ error: 'Item not found' });
+      res.json(this.serializeItem(item));
     } catch (error: any) {
       res.status(404).json({ error: error.message });
     }
@@ -26,7 +39,7 @@ export class MenuController {
     try {
       const file = req.file;
       const item = await this.menuService.createItem(req.body, file);
-      res.status(201).json(item);
+      res.status(201).json(this.serializeItem(item));
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
@@ -36,7 +49,7 @@ export class MenuController {
     try {
       const file = req.file;
       const item = await this.menuService.updateItem(req.params.id as string, req.body, file);
-      res.json(item);
+      res.json(this.serializeItem(item));
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }

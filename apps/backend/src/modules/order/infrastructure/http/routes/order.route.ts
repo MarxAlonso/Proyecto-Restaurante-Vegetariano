@@ -15,6 +15,7 @@ router.get('/kitchen', authenticate, requireRole('KITCHEN', 'ADMIN'), (req, res)
 router.get('/stats', authenticate, requireRole('KITCHEN', 'ADMIN'), (req, res) => orderController.getStats(req, res));
 router.get('/:id', authenticate, (req, res) => orderController.getById(req, res));
 router.post('/', authenticate, (req, res) => orderController.create(req, res));
+router.post('/guest', (req, res) => orderController.createGuestOrder(req, res));
 router.patch('/:id', authenticate, (req, res) => orderController.updateStatus(req, res));
 
 export default router;

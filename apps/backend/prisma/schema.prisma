@@ -61,15 +61,22 @@ model MenuItem {
 }
 
 model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  status      OrderStatus @default(PENDING)
-  total       Decimal     @db.Decimal(10, 2)
-  notes       String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  items       OrderItem[]
+  id                      String             @id @default(uuid())
+  userId                  String?
+  user                    User?              @relation(fields: [userId], references: [id])
+  status                  OrderStatus        @default(PENDING)
+  total                   Decimal            @db.Decimal(10, 2)
+  notes                   String?
+  orderType               OrderType          @default(DINE_IN)
+  paymentStatus           PaymentStatus      @default(PENDING)
+  customerName            String?
+  customerEmail           String?
+  customerPhone           String?
+  mercadoPagoPreferenceId String?
+  mercadoPagoPaymentId    String?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  items                   OrderItem[]
 }
 
 enum OrderStatus {
@@ -78,6 +85,18 @@ enum OrderStatus {
   READY
   COMPLETED
   CANCELLED
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
 }
 
 model OrderItem {

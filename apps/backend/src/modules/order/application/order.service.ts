@@ -3,8 +3,8 @@ import { OrderRepository } from '../domain/order.repository';
 export class OrderService {
   constructor(private orderRepository: OrderRepository) {}
 
-  async createOrder(userId: string, data: any) {
-    const { items, notes } = data;
+  async createOrder(data: any) {
+    const { items, notes, userId, orderType, customerName, customerEmail, customerPhone } = data;
 
     if (!items || items.length === 0) {
       throw new Error('No items provided');
@@ -13,10 +13,15 @@ export class OrderService {
     const total = items.reduce((sum: number, item: any) => sum + (Number(item.price) * item.quantity), 0);
 
     return this.orderRepository.save({
-      userId,
+      userId: userId || null,
       status: 'PENDING',
       total,
       notes,
+      orderType: orderType || 'DINE_IN',
+      paymentStatus: 'PENDING',
+      customerName: customerName || null,
+      customerEmail: customerEmail || null,
+      customerPhone: customerPhone || null,
       items: items.map((item: any) => ({
         menuItemId: item.id || item.menuItemId,
         quantity: item.quantity,
@@ -37,7 +42,6 @@ export class OrderService {
   }
 
   async updateStatus(orderId: string, status: string, userRole: string) {
-    // Basic validation based on role
     const upperStatus = status.toUpperCase();
     
     if (userRole === 'KITCHEN' && !['PREPARING', 'READY'].includes(upperStatus)) {
@@ -57,5 +61,13 @@ export class OrderService {
 
   async getOrderStats() {
     return this.orderRepository.countByStatus();
+  }
+
+  async updateMercadoPagoPreference(orderId: string, preferenceId: string) {
+    return this.orderRepository.updateMercadoPagoPreference(orderId, preferenceId);
+  }
+
+  async findByPreferenceId(preferenceId: string) {
+    return this.orderRepository.findByPreferenceId(preferenceId);
   }
 }
