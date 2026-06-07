@@ -23,6 +23,17 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
   }
 };
 
+export const tryAuth = (req: AuthRequest, _res: Response, next: NextFunction) => {
+  const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as User;
+      req.user = decoded;
+    } catch {}
+  }
+  next();
+};
+
 export const requireRole = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {

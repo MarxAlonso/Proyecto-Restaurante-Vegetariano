@@ -9,18 +9,20 @@ import {
   Settings,
   LogOut,
   ChefHat,
-  Tags
+  Tags,
+  Armchair
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const MENU_ITEMS = [
   { icon: BarChart3, label: "Dashboard", href: "/paneladmin" },
   { icon: ClipboardList, label: "Pedidos", href: "/paneladmin/pedidos" },
+  { icon: Armchair, label: "Mesas", href: "/paneladmin/mesas" },
   { icon: Package, label: "Productos", href: "/paneladmin/productos" },
-  { icon: Tags, label: "Categorías", href: "/paneladmin/categorias" },
+  { icon: Tags, label: "Categorias", href: "/paneladmin/categorias" },
   { icon: Users, label: "Clientes", href: "/paneladmin/clientes" },
   { icon: ChefHat, label: "Empleados", href: "/paneladmin/empleados" },
-  { icon: Settings, label: "Configuración", href: "/paneladmin/configuracion" },
+  { icon: Settings, label: "Configuracion", href: "/paneladmin/configuracion" },
 ];
 
 export default function Sidebar() {

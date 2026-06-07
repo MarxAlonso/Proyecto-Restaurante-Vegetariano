@@ -50,6 +50,17 @@ export async function seedDatabase() {
     }
   }
 
+  // Seed default tables
+  const tableCount = await prisma.table.count();
+  if (tableCount === 0) {
+    console.log('🪑 Creating default tables...');
+    for (let i = 1; i <= 10; i++) {
+      await prisma.table.create({
+        data: { number: i, capacity: i <= 5 ? 2 : 4, status: 'AVAILABLE' },
+      });
+    }
+  }
+
   console.log('✅ Seeding check complete.');
 }
 

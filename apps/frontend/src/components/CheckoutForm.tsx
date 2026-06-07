@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, CreditCard, UtensilsCrossed, Package, Loader2 } from 'lucide-react';
+import { ShoppingBag, CreditCard, UtensilsCrossed, Package, Loader2, Armchair } from 'lucide-react';
 import { useCart } from './providers/CartProvider';
 import { useAuth } from './providers/AuthProvider';
 import { fetchApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import TableSelector from './TableSelector';
 
 interface CheckoutFormProps {
   isGuest?: boolean;
@@ -18,6 +19,9 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [orderType, setOrderType] = useState<'DINE_IN' | 'TAKEAWAY'>('DINE_IN');
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [selectedTableNumber, setSelectedTableNumber] = useState<number | null>(null);
+  const [showTableSelector, setShowTableSelector] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -26,6 +30,11 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
   const [error, setError] = useState('');
 
   const formatPrice = (price: number | string) => `S/ ${Number(price).toFixed(2)}`;
+
+  const handleTableSelect = (tableId: string, tableNumber: number) => {
+    setSelectedTableId(tableId);
+    setSelectedTableNumber(tableNumber);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +52,10 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
         }
       }
 
+      if (orderType === 'DINE_IN' && !selectedTableId) {
+        throw new Error('Selecciona una mesa para comer en el local');
+      }
+
       const body: any = {
         items: items.map(item => ({
           id: item.id,
@@ -52,6 +65,7 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
         })),
         orderType,
         notes: '',
+        tableId: orderType === 'DINE_IN' ? selectedTableId : null,
       };
 
       if (isGuest) {
@@ -115,7 +129,7 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
             </button>
             <button
               type="button"
-              onClick={() => setOrderType('TAKEAWAY')}
+              onClick={() => { setOrderType('TAKEAWAY'); setSelectedTableId(null); setSelectedTableNumber(null); }}
               className={cn(
                 "p-4 rounded-xl border-2 text-center transition-all",
                 orderType === 'TAKEAWAY'
@@ -128,6 +142,40 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
               <p className="text-xs text-zinc-500 mt-1">Recoge en el local</p>
             </button>
           </div>
+
+          {/* Table selection for DINE_IN */}
+          {orderType === 'DINE_IN' && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => setShowTableSelector(true)}
+                className={cn(
+                  "w-full p-4 rounded-xl border-2 border-dashed text-center transition-all",
+                  selectedTableId
+                    ? "border-green-400 bg-green-50 dark:bg-green-900/20"
+                    : "border-zinc-300 dark:border-zinc-600 hover:border-primary"
+                )}
+              >
+                {selectedTableNumber ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-200 dark:bg-green-800 flex items-center justify-center">
+                      <span className="font-black text-green-700 dark:text-green-300">{selectedTableNumber}</span>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-green-700 dark:text-green-400">Mesa {selectedTableNumber}</p>
+                      <p className="text-xs text-green-600 dark:text-green-500">Haz clic para cambiar</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3 text-zinc-500">
+                    <Armchair className="w-5 h-5" />
+                    <span className="font-semibold">Seleccionar Mesa</span>
+                    <span className="text-xs">(Requerido para comer aquí)</span>
+                  </div>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Customer Info (only for guests) */}
@@ -227,6 +275,13 @@ export default function CheckoutForm({ isGuest = false }: CheckoutFormProps) {
           Al pagar aceptas nuestros términos y condiciones. Serás redirigido a Mercado Pago para completar el pago de forma segura.
         </p>
       </form>
+
+      <TableSelector
+        open={showTableSelector}
+        onClose={() => setShowTableSelector(false)}
+        onSelect={handleTableSelect}
+        mode="order"
+      />
     </div>
   );
 }

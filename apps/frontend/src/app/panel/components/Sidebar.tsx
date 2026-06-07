@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  History, 
-  User, 
-  LogOut 
+import {
+  LayoutDashboard,
+  History,
+  User,
+  LogOut,
+  CalendarDays,
+  Clock,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const MENU_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/panel" },
-  { icon: ShoppingBag, label: "Nuevo Pedido", href: "/panel/checkout" },
-  { icon: ShoppingBag, label: "Mis Pedidos", href: "/panel/pedidos" },
-  { icon: History, label: "Historial", href: "/panel/historial" },
+  { icon: History, label: "Historial", href: "/panel/pedidos" },
+  { icon: CalendarDays, label: "Reservar Mesa", href: "/panel/reservar" },
+  { icon: Clock, label: "Mis Reservas", href: "/panel/mis-reservas" },
   { icon: User, label: "Perfil", href: "/panel/perfil" },
 ];
 
@@ -43,7 +44,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-        <button 
+        <button
           onClick={logout}
           className="flex items-center gap-3 px-4 py-3 w-full text-zinc-600 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 rounded-lg transition-colors group"
         >

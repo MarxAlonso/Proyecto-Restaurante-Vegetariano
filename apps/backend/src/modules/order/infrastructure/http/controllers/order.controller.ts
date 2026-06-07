@@ -98,4 +98,42 @@ export class OrderController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async getAllOrders(req: Request, res: Response) {
+    try {
+      const { paymentStatus, status, startDate, endDate } = req.query as any;
+      const orders = await this.orderService.getAllOrders({ paymentStatus, status, startDate, endDate });
+      res.json(this.serializeOrders(orders));
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAdminStats(_req: Request, res: Response) {
+    try {
+      const stats = await this.orderService.getAdminStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getDailyRevenue(req: Request, res: Response) {
+    try {
+      const days = parseInt(req.query.days as string) || 7;
+      const revenue = await this.orderService.getDailyRevenue(days);
+      res.json(revenue);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteOrder(req: Request, res: Response) {
+    try {
+      await this.orderService.deleteOrder(req.params.id as string);
+      res.json({ message: 'Pedido eliminado exitosamente' });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 }

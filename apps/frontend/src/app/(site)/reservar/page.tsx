@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Phone, 
-  Mail, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  Phone,
+  Mail,
   User,
   UtensilsCrossed,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Armchair,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fetchApi } from "@/lib/api";
+import TableSelector from "@/components/TableSelector";
 
 const TIME_SLOTS = [
   "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -32,19 +35,33 @@ export default function ReservarPage() {
     guests: 2,
     specialRequests: "",
   });
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [selectedTableNumber, setSelectedTableNumber] = useState<number | null>(null);
+  const [showTableSelector, setShowTableSelector] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleTableSelect = (tableId: string, tableNumber: number) => {
+    setSelectedTableId(tableId);
+    setSelectedTableNumber(tableNumber);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     if (!formData.name || !formData.email || !formData.phone || !formData.date || !formData.time) {
       setError("Por favor completa todos los campos obligatorios.");
+      return;
+    }
+
+    if (!selectedTableId) {
+      setError("Por favor selecciona una mesa.");
       return;
     }
 
@@ -57,12 +74,27 @@ export default function ReservarPage() {
       return;
     }
 
-    setSubmitted(true);
+    setLoading(true);
+    try {
+      await fetchApi("/reservations", {
+        method: "POST",
+        body: JSON.stringify({
+          ...formData,
+          tableId: selectedTableId,
+          guests: Number(formData.guests),
+        }),
+      });
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || "Error al crear la reserva");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getMinDate = () => {
     const today = new Date();
-    return today.toISOString().split('T')[0];
+    return today.toISOString().split("T")[0];
   };
 
   if (submitted) {
@@ -82,11 +114,11 @@ export default function ReservarPage() {
             >
               <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
             </motion.div>
-            <h1 className="title-main mb-4">¡Reserva Confirmada!</h1>
+            <h1 className="title-main mb-4">Reserva Confirmada!</h1>
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 text-lg">
               Gracias <span className="font-bold text-primary">{formData.name}</span>. Tu reserva ha sido registrada exitosamente.
             </p>
-            
+
             <div className="card p-8 text-left bg-zinc-50 dark:bg-zinc-900/50">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-zinc-900 dark:text-white">
                 <UtensilsCrossed className="w-5 h-5 text-primary" />
@@ -106,8 +138,19 @@ export default function ReservarPage() {
                   <p className="font-semibold text-zinc-900 dark:text-white">{formData.guests} comensales</p>
                 </div>
                 <div>
+                  <p className="text-zinc-500 mb-1">Mesa</p>
+                  <p className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <Armchair size={14} />
+                    Mesa {selectedTableNumber}
+                  </p>
+                </div>
+                <div>
                   <p className="text-zinc-500 mb-1">Contacto</p>
                   <p className="font-semibold text-zinc-900 dark:text-white">{formData.phone}</p>
+                </div>
+                <div>
+                  <p className="text-zinc-500 mb-1">Email</p>
+                  <p className="font-semibold text-zinc-900 dark:text-white">{formData.email}</p>
                 </div>
               </div>
               {formData.specialRequests && (
@@ -123,6 +166,8 @@ export default function ReservarPage() {
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setSubmitted(false);
+                setSelectedTableId(null);
+                setSelectedTableNumber(null);
                 setFormData({ name: "", email: "", phone: "", date: "", time: "", guests: 2, specialRequests: "" });
               }}
               className="mt-8 btn-primary"
@@ -138,7 +183,7 @@ export default function ReservarPage() {
   return (
     <main className="pt-24 min-h-screen bg-white dark:bg-zinc-950 transition-colors pb-20">
       <div className="section-container">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
@@ -150,8 +195,7 @@ export default function ReservarPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Reservation Form */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="lg:col-span-2"
@@ -163,7 +207,7 @@ export default function ReservarPage() {
               </h2>
 
               {error && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3"
@@ -193,7 +237,7 @@ export default function ReservarPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1 flex items-center gap-2">
                       <Phone className="w-4 h-4 text-secondary" />
-                      Teléfono *
+                      Telefono *
                     </label>
                     <input
                       type="tel"
@@ -210,7 +254,7 @@ export default function ReservarPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1 flex items-center gap-2">
                     <Mail className="w-4 h-4 text-primary" />
-                    Correo Electrónico *
+                    Correo Electronico *
                   </label>
                   <input
                     type="email"
@@ -277,6 +321,35 @@ export default function ReservarPage() {
                   </div>
                 </div>
 
+                {/* Table Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1 flex items-center gap-2">
+                    <Armchair className="w-4 h-4 text-primary" />
+                    Mesa *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowTableSelector(true)}
+                    className={cn(
+                      "w-full p-4 rounded-xl border-2 border-dashed text-left transition-all",
+                      selectedTableId
+                        ? "border-green-400 bg-green-50 dark:bg-green-900/20"
+                        : "border-zinc-300 dark:border-zinc-600 hover:border-primary"
+                    )}
+                  >
+                    {selectedTableNumber ? (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-green-200 dark:bg-green-800 flex items-center justify-center">
+                          <span className="font-black text-green-700 dark:text-green-300">{selectedTableNumber}</span>
+                        </div>
+                        <span className="font-bold text-green-700 dark:text-green-400">Mesa {selectedTableNumber} seleccionada</span>
+                      </div>
+                    ) : (
+                      <span className="text-zinc-500 font-medium">Haz clic para seleccionar una mesa</span>
+                    )}
+                  </button>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
                     Solicitudes Especiales
@@ -287,26 +360,35 @@ export default function ReservarPage() {
                     onChange={handleChange}
                     rows={4}
                     className="input bg-white dark:bg-zinc-950 resize-none"
-                    placeholder="Ej: Mesa junto a la ventana, celebrate un cumpleaños, alergia a frutos secos..."
+                    placeholder="Ej: Mesa junto a la ventana, celebra un cumpleanos, alergia a frutos secos..."
                   />
                 </div>
 
-                <motion.button 
+                <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  type="submit" 
+                  type="submit"
+                  disabled={loading}
                   className="w-full btn-primary flex items-center justify-center gap-2 h-12 text-lg"
                 >
-                  <UtensilsCrossed className="w-5 h-5" />
-                  Confirmar Reserva
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <UtensilsCrossed className="w-5 h-5" />
+                      Confirmar Reserva
+                    </>
+                  )}
                 </motion.button>
               </form>
             </div>
           </motion.div>
 
-          {/* Info Cards */}
           <div className="space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
@@ -321,13 +403,13 @@ export default function ReservarPage() {
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     Lunes a Viernes: 12pm - 11pm
                     <br />
-                    Sábados y Domingos: 12pm - 5pm
+                    Sabados y Domingos: 12pm - 5pm
                   </p>
                 </div>
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -338,7 +420,7 @@ export default function ReservarPage() {
                   <Phone className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-zinc-900 dark:text-white mb-1">Reservas por Teléfono</h3>
+                  <h3 className="font-bold text-zinc-900 dark:text-white mb-1">Reservas por Telefono</h3>
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     +51 987 654 321
                     <br />
@@ -348,7 +430,7 @@ export default function ReservarPage() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
@@ -359,54 +441,23 @@ export default function ReservarPage() {
                   <CheckCircle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-zinc-900 dark:text-white mb-1">Política de Cancelación</h3>
+                  <h3 className="font-bold text-zinc-900 dark:text-white mb-1">Politica de Cancelacion</h3>
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     Cancela o reprograma hasta 2 horas antes de tu reserva sin costo adicional.
                   </p>
                 </div>
               </div>
             </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="card overflow-hidden"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Interior del restaurante"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-bold text-zinc-900 dark:text-white mb-2">Ambiente Premium</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Disponemos de espacios íntimos para parejas, familias y eventos privados.
-                </p>
-              </div>
-            </motion.div>
           </div>
         </div>
-
-        {/* Map / Location Banner */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-24 rounded-[24px] overflow-hidden border border-zinc-200 dark:border-zinc-800 h-[300px] relative group"
-        >
-          <img
-            src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-            alt="Restaurante"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-8 left-8 right-8">
-            <h3 className="text-white text-2xl font-bold mb-2">Encuéntranos</h3>
-            <p className="text-zinc-200">Av. Gastronomía 123, Lima, Perú</p>
-          </div>
-        </motion.div>
       </div>
+
+      <TableSelector
+        open={showTableSelector}
+        onClose={() => setShowTableSelector(false)}
+        onSelect={handleTableSelect}
+        mode="reservation"
+      />
     </main>
   );
 }

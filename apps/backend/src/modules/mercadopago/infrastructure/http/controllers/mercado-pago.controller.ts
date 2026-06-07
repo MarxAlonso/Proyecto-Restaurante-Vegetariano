@@ -25,7 +25,7 @@ export class MercadoPagoController {
   async createPreference(req: Request, res: Response) {
     try {
       const userId = this.getUserId(req);
-      const { items, notes, orderType, customerName, customerEmail, customerPhone } = req.body;
+      const { items, notes, orderType, tableId, customerName, customerEmail, customerPhone } = req.body;
 
       if (!items || items.length === 0) {
         return res.status(400).json({ error: 'No items provided' });
@@ -36,6 +36,7 @@ export class MercadoPagoController {
         items,
         notes,
         orderType: orderType || 'DINE_IN',
+        tableId: tableId || undefined,
         customerName: customerName || undefined,
         customerEmail: customerEmail || undefined,
         customerPhone: customerPhone || undefined,

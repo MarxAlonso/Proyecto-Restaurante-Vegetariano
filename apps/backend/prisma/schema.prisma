@@ -17,6 +17,7 @@ model User {
   createdAt DateTime           @default(now())
   orders    Order[]
   payments  EmployeePayment[]
+  reservations Reservation[]
 }
 
 model EmployeePayment {
@@ -72,11 +73,52 @@ model Order {
   customerName            String?
   customerEmail           String?
   customerPhone           String?
+  tableId                 String?
+  table                   Table?              @relation(fields: [tableId], references: [id])
   mercadoPagoPreferenceId String?
   mercadoPagoPaymentId    String?
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
   items                   OrderItem[]
+}
+
+model Table {
+  id           String            @id @default(uuid())
+  number       Int               @unique
+  capacity     Int               @default(4)
+  status       TableStatus       @default(AVAILABLE)
+  createdAt    DateTime          @default(now())
+  orders       Order[]
+  reservations Reservation[]
+}
+
+model Reservation {
+  id              String            @id @default(uuid())
+  userId          String?
+  user            User?             @relation(fields: [userId], references: [id])
+  name            String
+  email           String
+  phone           String
+  date            DateTime
+  time            String
+  guests          Int               @default(2)
+  tableId         String
+  table           Table             @relation(fields: [tableId], references: [id])
+  specialRequests String?
+  status          ReservationStatus @default(CONFIRMED)
+  createdAt       DateTime          @default(now())
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }
 
 enum OrderStatus {
