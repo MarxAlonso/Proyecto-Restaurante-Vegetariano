@@ -126,8 +126,8 @@ Para auditar las tablas en producción de forma ágil y segura sin alterar scrip
 
 ---
 
-## 5. Pruebas de Calidad Automatizadas Multi-Capa (Selenium + Playwright + Supertest)
-Para cumplir con los más altos estándares de ingeniería de software, el monorepo implementa una **Pirámide de Pruebas** automatizada de tres niveles que cubre de extremo a extremo (E2E) y en aislamiento la robustez del sistema:
+## 5. Pruebas de Calidad Automatizadas Multi-Capa (k6 + Selenium + Playwright + Supertest)
+Para cumplir con los más altos estándares de ingeniería de software, el monorepo implementa una **Pirámide de Pruebas** automatizada de **cuatro niveles** que cubre desde el rendimiento bajo carga hasta la interacción de usuario, pasando por la integración de API:
 
 ### 5.1. Capa 1: Pruebas de Integración de API HTTP (Supertest + Vitest en el Backend)
 Ejecutadas en aislamiento bajo `apps/backend/src/tests/api.spec.ts`. Prueban la lógica de negocio y conectividad ORM sin abrir navegadores:
@@ -146,6 +146,18 @@ Ejecutadas en `apps/selenium-test-nutribrain/src/specs/`. Selenium 4 provee vali
 *   **Navegación ([navigation.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/navigation.spec.ts))**: Navegación y alternancia de accesibilidad global.
 *   **Autenticación ([auth.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/auth.spec.ts))**: Login, control de accesos a paneles y validación de elementos dinámicos de base de datos.
 *   **Seguridad Web ([security.spec.ts](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/selenium-test-nutribrain/src/specs/security.spec.ts))**: Intento de inyecciones de código malicioso (ataques Cross-Site Scripting (XSS) y SQL Injection (SQLi) clásicos), validando que las entradas se saniticen correctamente en el cliente y el backend.
+
+### 5.4. Capa 4: Pruebas de Estrés y Rendimiento (k6 + Node.js)
+Ejecutadas en `apps/stress-testing/k6-scripts/`. k6 de Grafana simula cientos de usuarios concurrentes para validar la robustez del backend bajo carga:
+*   **Autenticación ([auth-stress.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/auth-stress.js))**: Simula 10→100 usuarios haciendo login y registro concurrente. Valida que el servidor Express + Prisma mantiene p95 < 2s.
+*   **Menú/Catálogo ([menu-stress.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/menu-stress.js))**: 200 lecturas concurrentes del catálogo. Valida que PostgreSQL responde sin degradación.
+*   **Pedidos ([orders-stress.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/orders-stress.js))**: Flujo completo cliente→cocina→admin bajo carga.
+*   **Reservas ([reservations-stress.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/reservations-stress.js))**: Creación concurrente de reservas y consulta de mesas.
+*   **Sistema Integral ([full-system-stress.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/full-system-stress.js))**: Simula un día completo de operación (apertura→almuerzo→cena→cierre).
+*   **Resistencia/Soak ([soak-test.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/soak-test.js))**: 30 usuarios constantes durante 30 minutos para detectar fugas de memoria.
+*   **Pico Repentino/Spike ([spike-test.js](file:///c:/developer-marx/Proyectos%20Universitarios/Proyecto%20Restaurante%20Vegetariano/apps/stress-testing/k6-scripts/spike-test.js))**: 5→300 usuarios en 10 segundos validando resiliencia del sistema.
+
+Ver [guía completa de stress testing](../pruebas%20de%20testeo/guia_stress_testing_k6.md) para instrucciones paso a paso.
 
 ---
 
@@ -176,8 +188,31 @@ Con `pnpm dev` activo en paralelo:
 pnpm test:selenium
 ```
 
-### 6.4. Ejecutar Todo el Pipeline de Calidad
-Valida de punta a punta el backend, Selenium y Playwright consecutivamente:
+### 6.4. Ejecutar Pruebas de Estrés (k6)
+Con `pnpm dev` activo en una terminal, ejecuta en otra terminal:
+*   **Prueba rápida de autenticación**:
+    ```bash
+    pnpm test:stress:auth
+    ```
+*   **Prueba integral del sistema (día completo)**:
+    ```bash
+    pnpm test:stress:full
+    ```
+*   **Prueba de resistencia (30 min)**:
+    ```bash
+    pnpm test:stress:soak
+    ```
+*   **Prueba de pico repentino**:
+    ```bash
+    pnpm test:stress:spike
+    ```
+*   **Analizar resultados JSON**:
+    ```bash
+    pnpm test:stress:analyze reports/mis-resultados.json
+    ```
+
+### 6.5. Ejecutar Todo el Pipeline de Calidad
+Valida el backend, Selenium, Playwright y pruebas de estrés consecutivamente:
 ```bash
 pnpm test:all
 ```

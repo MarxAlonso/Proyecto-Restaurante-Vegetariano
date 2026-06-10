@@ -1,0 +1,102 @@
+{
+  "service": "Restaurant Veg (RESTVEG_BD)",
+  "version": "1.0.0",
+  "slo_document": {
+    "availability": {
+      "target": 99.5,
+      "measurement": "Porcentaje de requests exitosos / total requests",
+      "window": "30 días rodantes",
+      "error_budget": "0.5% = 216 minutos de downtime permitido por mes"
+    },
+    "latency": {
+      "auth_endpoints": {
+        "p95_target_ms": 2000,
+        "p99_target_ms": 5000,
+        "description": "Login, registro y verificación de sesión deben responder rápido incluso bajo carga"
+      },
+      "menu_endpoints": {
+        "p95_target_ms": 1000,
+        "p99_target_ms": 3000,
+        "description": "Catálogo y menú son de solo lectura, deben ser ultrarrápidos con caché"
+      },
+      "order_endpoints": {
+        "p95_target_ms": 3000,
+        "p99_target_ms": 7000,
+        "description": "Creación de pedidos involucra escritura en DB, tolerancia mayor"
+      },
+      "reservation_endpoints": {
+        "p95_target_ms": 2500,
+        "p99_target_ms": 5000,
+        "description": "Reservas implican verificación de disponibilidad y escritura"
+      }
+    },
+    "throughput": {
+      "min_requests_per_second": 10,
+      "target_peak_rps": 200,
+      "description": "Capacidad mínima de 10 req/s sostenidos, picos de hasta 200 req/s"
+    },
+    "error_rate": {
+      "target": "menor a 1%",
+      "exclude": ["429 Too Many Requests (rate limiting esperado)"],
+      "description": "Máximo 1% de errores 5xx o timeouts"
+    }
+  },
+  "error_budget_policy": {
+    "monthly_error_budget_seconds": 12960,
+    "severity_levels": [
+      {
+        "level": "critical",
+        "budget_consumed_percent": 80,
+        "action": "Congelar deploys hasta investigación. Notificar al equipo."
+      },
+      {
+        "level": "warning",
+        "budget_consumed_percent": 50,
+        "action": "Priorizar deuda técnica y optimizaciones de rendimiento."
+      },
+      {
+        "level": "healthy",
+        "budget_consumed_percent": 20,
+        "action": "Operación normal. Continuar con nuevas features."
+      }
+    ],
+    "burn_rate_alerts": [
+      {
+        "rate": "> 2x por hora",
+        "action": "Alertar al equipo de backend. Posible fuga de memoria o ataque DDoS."
+      },
+      {
+        "rate": "> 10x por 5 minutos",
+        "action": "Alerta crítica. Incidente activo. Activar runbook de recuperación."
+      }
+    ]
+  },
+  "test_scenarios": [
+    {
+      "name": "load_test",
+      "frequency": "Diaria (en CI/CD)",
+      "tool": "k6",
+      "script": "k6-scripts/full-system-stress.js"
+    },
+    {
+      "name": "soak_test",
+      "frequency": "Semanal",
+      "tool": "k6",
+      "script": "k6-scripts/soak-test.js",
+      "description": "30 usuarios constantes por 30 min para detectar memory leaks"
+    },
+    {
+      "name": "spike_test",
+      "frequency": "Post-deploy",
+      "tool": "k6",
+      "script": "k6-scripts/spike-test.js",
+      "description": "300 usuarios repentinos para validar auto-scaling"
+    },
+    {
+      "name": "smoke_test",
+      "frequency": "Cada commit",
+      "tool": "k6",
+      "script": "Ejecutar 1 VU de cada escenario para validar endpoints"
+    }
+  ]
+}

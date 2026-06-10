@@ -13,6 +13,14 @@
     "test:playwright:ui": "pnpm --filter restaurant-veg exec playwright test --ui",
     "test:backend": "pnpm --filter restaurant-veg-backend test",
     "test:backend:testenv": "cross-env NODE_ENV=test PORT=3002 pnpm --filter restaurant-veg-backend start",
+    "test:stress:auth": "cd apps/stress-testing && k6 run k6-scripts/auth-stress.js",
+    "test:stress:menu": "cd apps/stress-testing && k6 run k6-scripts/menu-stress.js",
+    "test:stress:orders": "cd apps/stress-testing && k6 run k6-scripts/orders-stress.js",
+    "test:stress:reservations": "cd apps/stress-testing && k6 run k6-scripts/reservations-stress.js",
+    "test:stress:full": "cd apps/stress-testing && k6 run k6-scripts/full-system-stress.js",
+    "test:stress:soak": "cd apps/stress-testing && k6 run k6-scripts/soak-test.js",
+    "test:stress:spike": "cd apps/stress-testing && k6 run k6-scripts/spike-test.js",
+    "test:stress:analyze": "cd apps/stress-testing && node src/helpers/analyze-results.mjs",
     "test:all": "pnpm test:backend && pnpm test:selenium && pnpm test:playwright"
   },
   "devDependencies": {

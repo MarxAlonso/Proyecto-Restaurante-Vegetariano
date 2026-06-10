@@ -1,0 +1,27 @@
+{
+  "name": "stress-testing-restveg",
+  "version": "1.0.0",
+  "description": "Suite de pruebas de estrés, carga y rendimiento para Restaurant Veg (RESTVEG_BD)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:auth": "k6 run k6-scripts/auth-stress.js",
+    "test:menu": "k6 run k6-scripts/menu-stress.js",
+    "test:orders": "k6 run k6-scripts/orders-stress.js",
+    "test:reservations": "k6 run k6-scripts/reservations-stress.js",
+    "test:all": "k6 run k6-scripts/full-system-stress.js",
+    "test:soak": "k6 run k6-scripts/soak-test.js",
+    "test:spike": "k6 run k6-scripts/spike-test.js",
+    "report:html": "k6 run --out json=reports/results.json k6-scripts/full-system-stress.js && k6 report --out reports/report.html reports/results.json",
+    "analyze": "node src/helpers/analyze-results.mjs",
+    "test:all:vitest": "vitest run",
+    "test:all:vitest:watch": "vitest"
+  },
+  "devDependencies": {
+    "autocannon": "^7.15.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
