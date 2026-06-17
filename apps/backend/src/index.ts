@@ -4,9 +4,11 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
 
 import path from 'path';
 
+import { swaggerSpec } from './infrastructure/swagger.config';
 import authRoutes from './modules/auth/infrastructure/http/routes/auth.route';
 import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route';
 import categoryRoutes from './modules/categories/infrastructure/http/routes/category.route';
@@ -80,12 +82,30 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Swagger UI
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayOperationId: false,
+  },
+  customCss: `.swagger-ui .topbar { display: none }`,
+  customSiteTitle: 'Restaurant Veg API Documentation',
+}));
+
+// OpenAPI JSON endpoint
+app.get('/api/openapi.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // Ruta raíz
 app.get('/', (_req, res) => {
   res.json({
     name: 'Restaurant Veg Backend API',
     version: '1.0.0',
     status: 'running',
+    documentation: '/api/docs',
+    openapi: '/api/openapi.json',
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
@@ -94,7 +114,9 @@ app.get('/', (_req, res) => {
       orders: '/api/orders',
       users: '/api/users',
       payments: '/api/payments',
-      mercadopago: '/api/mercadopago'
+      mercadopago: '/api/mercadopago',
+      tables: '/api/tables',
+      reservations: '/api/reservations'
     }
   });
 });

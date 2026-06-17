@@ -24,6 +24,6 @@
     "test:all": "pnpm test:backend && pnpm test:selenium && pnpm test:playwright"
   },
   "devDependencies": {
-    "pnpm": "^9.0.0"
+    "pnpm": "^11.7.0"
   }
 }

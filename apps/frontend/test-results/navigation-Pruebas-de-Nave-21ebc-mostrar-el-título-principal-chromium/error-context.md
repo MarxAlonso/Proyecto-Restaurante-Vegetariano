@@ -45,134 +45,131 @@ Call log:
           - link "Contacto" [ref=e10] [cursor=pointer]:
             - /url: /contacto
         - generic [ref=e11]:
-          - button "Toggle theme" [ref=e12]:
+          - button [ref=e12]:
             - img [ref=e13]
-          - link "Ingresar" [ref=e15] [cursor=pointer]:
+          - button "Toggle theme" [ref=e17]:
+            - img [ref=e18]
+          - link "Ingresar" [ref=e20] [cursor=pointer]:
             - /url: /login
-          - link "Reservar" [ref=e16] [cursor=pointer]:
+          - link "Reservar" [ref=e21] [cursor=pointer]:
             - /url: /reservar
-    - main [ref=e18]:
-      - generic [ref=e22]:
-        - link "Sabor Natural & Parrilla Premium" [ref=e23] [cursor=pointer]:
+    - main [ref=e23]:
+      - generic [ref=e27]:
+        - link "Sabor Natural & Parrilla Premium" [ref=e28] [cursor=pointer]:
           - /url: /
-        - paragraph [ref=e24]: Descubre la fusión perfecta entre la frescura vegetal y el ahumado inconfundible de nuestra parrilla. Una experiencia gastronómica única en el corazón de la ciudad.
-        - generic [ref=e25]:
-          - link "Ver Menú" [ref=e26] [cursor=pointer]:
+        - paragraph [ref=e29]: Descubre la fusión perfecta entre la frescura vegetal y el ahumado inconfundible de nuestra parrilla. Una experiencia gastronómica única en el corazón de la ciudad.
+        - generic [ref=e30]:
+          - link "Ver Menú" [ref=e31] [cursor=pointer]:
             - /url: /menu
-          - link "Reservar Mesa" [ref=e27] [cursor=pointer]:
+          - link "Reservar Mesa" [ref=e32] [cursor=pointer]:
             - /url: /reservar
-      - generic [ref=e30]:
-        - generic [ref=e31] [cursor=pointer]:
-          - img "Vegetariano" [ref=e32]
-          - generic [ref=e34]:
-            - generic [ref=e35]:
-              - img [ref=e36]
-              - generic [ref=e39]: Categoría
-            - heading "Vegetariano" [level=3] [ref=e40]
-            - paragraph [ref=e41]: Explora la frescura y vitalidad de nuestros platos 100% vegetales.
-            - link "Explorar Carta" [ref=e42]:
+      - generic [ref=e35]:
+        - generic [ref=e36] [cursor=pointer]:
+          - img "Vegetariano" [ref=e37]
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - img [ref=e41]
+              - generic [ref=e44]: Categoría
+            - heading "Vegetariano" [level=3] [ref=e45]
+            - paragraph [ref=e46]: Explora la frescura y vitalidad de nuestros platos 100% vegetales.
+            - link "Explorar Carta" [ref=e47]:
               - /url: /menu?category=Vegetariano
               - text: Explorar Carta
-              - img [ref=e43]
-        - generic [ref=e45] [cursor=pointer]:
-          - img "Parrilla" [ref=e46]
-          - generic [ref=e48]:
-            - generic [ref=e49]:
-              - img [ref=e50]
-              - generic [ref=e52]: Categoría
-            - heading "Parrilla" [level=3] [ref=e53]
-            - paragraph [ref=e54]: El sabor ahumado y la técnica perfecta en cada corte premium.
-            - link "Explorar Carta" [ref=e55]:
+              - img [ref=e48]
+        - generic [ref=e50] [cursor=pointer]:
+          - img "Parrilla" [ref=e51]
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - generic [ref=e57]: Categoría
+            - heading "Parrilla" [level=3] [ref=e58]
+            - paragraph [ref=e59]: El sabor ahumado y la técnica perfecta en cada corte premium.
+            - link "Explorar Carta" [ref=e60]:
               - /url: /menu?category=Parrilla
               - text: Explorar Carta
-              - img [ref=e56]
-      - generic [ref=e59]:
-        - generic [ref=e60]:
-          - generic [ref=e61]:
-            - img [ref=e62]
-            - generic [ref=e64]: Selección Especial
-            - img [ref=e65]
-          - heading "Platos Destacados" [level=2] [ref=e67]
-          - paragraph [ref=e68]: Una selección de nuestros platos más aclamados, preparados con los ingredientes más frescos.
-        - generic [ref=e69]:
-          - generic [ref=e70]:
-            - generic [ref=e71]:
-              - img "Hamburguesa de Lentejas" [ref=e72]
-              - generic [ref=e73]:
-                - img [ref=e74]
-                - text: Vegetariano
-            - generic [ref=e77]:
+              - img [ref=e61]
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - img [ref=e67]
+            - generic [ref=e69]: Selección Especial
+            - img [ref=e70]
+          - heading "Platos Destacados" [level=2] [ref=e72]
+          - paragraph [ref=e73]: Una selección de nuestros platos más aclamados, preparados con los ingredientes más frescos.
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - img "Hamburguesa de Lentejas" [ref=e77]
               - generic [ref=e78]:
-                - heading "Hamburguesa de Lentejas" [level=3] [ref=e79]
-                - generic [ref=e80]: S/ 28.00
-              - paragraph [ref=e81]: Con queso vegano, rúcula y cebollas caramelizadas.
-              - button "Añadir al Pedido" [ref=e82]:
-                - img [ref=e83]
-                - text: Añadir al Pedido
-          - generic [ref=e87]:
-            - generic [ref=e88]:
-              - img "Costillas a la Parrilla" [ref=e89]
-              - generic [ref=e90]:
-                - img [ref=e91]
-                - text: Parrilla
-            - generic [ref=e93]:
-              - generic [ref=e94]:
-                - heading "Costillas a la Parrilla" [level=3] [ref=e95]
-                - generic [ref=e96]: S/ 45.00
-              - paragraph [ref=e97]: Con salsa barbacoa de la casa y papas rústicas.
-              - button "Añadir al Pedido" [ref=e98]:
-                - img [ref=e99]
-                - text: Añadir al Pedido
-          - generic [ref=e103]:
-            - generic [ref=e104]:
-              - img "Ensalada Quinoa Real" [ref=e105]
-              - generic [ref=e106]:
-                - img [ref=e107]
+                - img [ref=e79]
                 - text: Vegetariano
-            - generic [ref=e110]:
-              - generic [ref=e111]:
-                - heading "Ensalada Quinoa Real" [level=3] [ref=e112]
-                - generic [ref=e113]: S/ 24.00
-              - paragraph [ref=e114]: Palta, tomates cherry y vinagreta de cítricos.
-              - button "Añadir al Pedido" [ref=e115]:
-                - img [ref=e116]
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - heading "Hamburguesa de Lentejas" [level=3] [ref=e84]
+                - generic [ref=e85]: S/ 28.00
+              - paragraph [ref=e86]: Con queso vegano, rúcula y cebollas caramelizadas.
+              - button "Añadir al Pedido" [ref=e87]:
+                - img [ref=e88]
                 - text: Añadir al Pedido
-    - contentinfo [ref=e120]:
-      - generic [ref=e121]:
-        - generic [ref=e122]:
-          - link "RESTAURANTVEG" [ref=e123] [cursor=pointer]:
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - img "Costillas a la Parrilla" [ref=e94]
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - text: Parrilla
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - heading "Costillas a la Parrilla" [level=3] [ref=e100]
+                - generic [ref=e101]: S/ 45.00
+              - paragraph [ref=e102]: Con salsa barbacoa de la casa y papas rústicas.
+              - button "Añadir al Pedido" [ref=e103]:
+                - img [ref=e104]
+                - text: Añadir al Pedido
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - img "Ensalada Quinoa Real" [ref=e110]
+              - generic [ref=e111]:
+                - img [ref=e112]
+                - text: Vegetariano
+            - generic [ref=e115]:
+              - generic [ref=e116]:
+                - heading "Ensalada Quinoa Real" [level=3] [ref=e117]
+                - generic [ref=e118]: S/ 24.00
+              - paragraph [ref=e119]: Palta, tomates cherry y vinagreta de cítricos.
+              - button "Añadir al Pedido" [ref=e120]:
+                - img [ref=e121]
+                - text: Añadir al Pedido
+    - contentinfo [ref=e125]:
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - link "RESTAURANTVEG" [ref=e128] [cursor=pointer]:
             - /url: /
-          - paragraph [ref=e124]: La mejor experiencia gastronómica vegetariana y a la parrilla. Productos frescos del campo a tu mesa.
-        - generic [ref=e125]:
-          - heading "Enlaces" [level=4] [ref=e126]
-          - list [ref=e127]:
-            - listitem [ref=e128]:
-              - link "Menú" [ref=e129] [cursor=pointer]:
+          - paragraph [ref=e129]: La mejor experiencia gastronómica vegetariana y a la parrilla. Productos frescos del campo a tu mesa.
+        - generic [ref=e130]:
+          - heading "Enlaces" [level=4] [ref=e131]
+          - list [ref=e132]:
+            - listitem [ref=e133]:
+              - link "Menú" [ref=e134] [cursor=pointer]:
                 - /url: /menu
-            - listitem [ref=e130]:
-              - link "Reservar" [ref=e131] [cursor=pointer]:
+            - listitem [ref=e135]:
+              - link "Reservar" [ref=e136] [cursor=pointer]:
                 - /url: /reservar
-            - listitem [ref=e132]:
-              - link "Nosotros" [ref=e133] [cursor=pointer]:
+            - listitem [ref=e137]:
+              - link "Nosotros" [ref=e138] [cursor=pointer]:
                 - /url: /nosotros
-            - listitem [ref=e134]:
-              - link "Contacto" [ref=e135] [cursor=pointer]:
+            - listitem [ref=e139]:
+              - link "Contacto" [ref=e140] [cursor=pointer]:
                 - /url: /contacto
-        - generic [ref=e136]:
-          - heading "Contacto" [level=4] [ref=e137]
-          - list [ref=e138]:
-            - listitem [ref=e139]: Av. Principal 123, Lima
-            - listitem [ref=e140]: +51 987 654 321
-            - listitem [ref=e141]: info@restaurantveg.com
-      - paragraph [ref=e143]: © 2024 Restaurant Veg. Todos los derechos reservados.
-  - button "Open Next.js Dev Tools" [ref=e149] [cursor=pointer]:
-    - generic [ref=e152]:
-      - text: Compiling
-      - generic [ref=e153]:
-        - generic [ref=e154]: .
-        - generic [ref=e155]: .
-        - generic [ref=e156]: .
-  - alert [ref=e157]
+        - generic [ref=e141]:
+          - heading "Contacto" [level=4] [ref=e142]
+          - list [ref=e143]:
+            - listitem [ref=e144]: Av. Principal 123, Lima
+            - listitem [ref=e145]: +51 987 654 321
+            - listitem [ref=e146]: info@restaurantveg.com
+      - paragraph [ref=e148]: © 2024 Restaurant Veg. Todos los derechos reservados.
+  - button "Open Next.js Dev Tools" [ref=e154] [cursor=pointer]:
+    - img [ref=e155]
+  - alert [ref=e158]
 ```
 
 # Test source

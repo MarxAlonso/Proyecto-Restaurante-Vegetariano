@@ -33,10 +33,12 @@ Call log:
   - navigation:
     - link "Dashboard":
       - /url: /panel
-    - link "Mis Pedidos":
-      - /url: /panel/pedidos
     - link "Historial":
-      - /url: /panel/historial
+      - /url: /panel/pedidos
+    - link "Reservar Mesa":
+      - /url: /panel/reservar
+    - link "Mis Reservas":
+      - /url: /panel/mis-reservas
     - link "Perfil":
       - /url: /panel/perfil
   - button "Cerrar Sesión"
@@ -52,31 +54,20 @@ Call log:
   - heading "¡Hola, Client! 👋" [level=1]
   - paragraph: Aquí tienes un resumen de tus pedidos y actividad.
   - paragraph: Pedidos Totales
-  - paragraph: "12"
-  - paragraph: En Camino
-  - paragraph: "1"
-  - paragraph: Puntos Veg
-  - paragraph: "450"
-  - paragraph: Ahorro Mensual
-  - paragraph: S/ 85
+  - paragraph: "0"
+  - paragraph: Pedidos Activos
+  - paragraph: "0"
+  - paragraph: Completados
+  - paragraph: "0"
+  - paragraph: Total Gastado
+  - paragraph: S/ 0.00
   - heading "Pedidos Recientes" [level=2]
-  - button "Ver todo"
-  - paragraph: "Pedido #ORD-1001"
-  - paragraph: 20 de Abril, 2024 • 3 items
-  - paragraph: S/ 54.00
-  - text: Entregado
-  - paragraph: "Pedido #ORD-1002"
-  - paragraph: 20 de Abril, 2024 • 3 items
-  - paragraph: S/ 54.00
-  - text: Entregado
-  - paragraph: "Pedido #ORD-1003"
-  - paragraph: 20 de Abril, 2024 • 3 items
-  - paragraph: S/ 54.00
-  - text: Entregado
-  - heading "Favoritos" [level=2]
-  - paragraph: Hamburguesa Veggie
-  - paragraph: Has pedido este plato 5 veces este mes.
-  - button "Pedir de nuevo"
+  - link "Ver todo":
+    - /url: /panel/pedidos
+  - paragraph: No tienes pedidos aún
+  - paragraph: Explora el menú y haz tu primer pedido
+  - heading "Resumen" [level=2]
+  - text: Pedidos Totales 0 Completados 0 Cancelados 0 Total Gastado S/ 0.00
 ```
 
 # Test source
