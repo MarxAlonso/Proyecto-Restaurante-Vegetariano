@@ -19,6 +19,7 @@ export interface OrderEntity {
   customerPhone?: string | null;
   tableId?: string | null;
   table?: { id: string; number: number } | null;
+  user?: { id: string; name: string; email: string } | null;
   mercadoPagoPreferenceId?: string | null;
   mercadoPagoPaymentId?: string | null;
   items: OrderItemEntity[];

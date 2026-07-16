@@ -1,6 +1,22 @@
 import { CategoryRepository } from '../../domain/category.repository';
 import { CategoryEntity } from '../../domain/category.entity';
 import prisma from '../../../../infrastructure/persistence/prisma.client';
+import { Prisma } from '@prisma/client';
+
+type CategoryWithCount = Prisma.CategoryGetPayload<{
+  include: { _count: { select: { menuItems: true } } };
+}>;
+
+function toCategoryEntity(cat: CategoryWithCount): CategoryEntity {
+  return {
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description,
+    createdAt: cat.createdAt,
+    _count: { menuItems: cat._count.menuItems },
+  };
+}
 
 export class PrismaCategoryRepository implements CategoryRepository {
   async findAll(): Promise<CategoryEntity[]> {
@@ -8,7 +24,7 @@ export class PrismaCategoryRepository implements CategoryRepository {
       include: { _count: { select: { menuItems: true } } },
       orderBy: { name: 'asc' },
     });
-    return cats as any as CategoryEntity[];
+    return cats.map(toCategoryEntity);
   }
 
   async findById(id: string): Promise<CategoryEntity | null> {
@@ -16,7 +32,7 @@ export class PrismaCategoryRepository implements CategoryRepository {
       where: { id },
       include: { _count: { select: { menuItems: true } } },
     });
-    return cat as any as CategoryEntity | null;
+    return cat ? toCategoryEntity(cat) : null;
   }
 
   async findBySlug(slug: string): Promise<CategoryEntity | null> {
@@ -24,7 +40,7 @@ export class PrismaCategoryRepository implements CategoryRepository {
       where: { slug },
       include: { _count: { select: { menuItems: true } } },
     });
-    return cat as any as CategoryEntity | null;
+    return cat ? toCategoryEntity(cat) : null;
   }
 
   async save(item: Omit<CategoryEntity, 'id' | 'createdAt' | '_count'>): Promise<CategoryEntity> {
@@ -36,7 +52,7 @@ export class PrismaCategoryRepository implements CategoryRepository {
       },
       include: { _count: { select: { menuItems: true } } },
     });
-    return created as any as CategoryEntity;
+    return toCategoryEntity(created);
   }
 
   async update(id: string, item: Partial<CategoryEntity>): Promise<CategoryEntity> {
@@ -49,7 +65,7 @@ export class PrismaCategoryRepository implements CategoryRepository {
       },
       include: { _count: { select: { menuItems: true } } },
     });
-    return updated as any as CategoryEntity;
+    return toCategoryEntity(updated);
   }
 
   async delete(id: string): Promise<void> {

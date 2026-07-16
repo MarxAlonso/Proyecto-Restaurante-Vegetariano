@@ -1,11 +1,19 @@
+/**
+ * API Client — Frontend to Backend
+ *
+ * Security best practice: La autenticación se realiza via cookie httpOnly
+ * (Set-Cookie del backend). No se almacena JWT en localStorage para
+ * prevenir exfiltración por XSS. (ISO 25010 - Security - Confidentiality)
+ *
+ * Las cookies httpOnly via credentials: 'include' se envían automáticamente
+ * en cada petición, sin intervención de JavaScript.
+ */
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
   };
 
   if (options.headers) {
@@ -15,6 +23,8 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
+    // Security: Envía cookies httpOnly automáticamente
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -26,16 +36,13 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 export const uploadFile = async (endpoint: string, formData: FormData, method: string = 'POST') => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
   const headers: Record<string, string> = {};
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
+    // Security: Cookies httpOnly via credentials
+    credentials: 'include',
     body: formData,
   });
 

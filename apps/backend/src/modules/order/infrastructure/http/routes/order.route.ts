@@ -3,6 +3,8 @@ import { OrderController } from '../controllers/order.controller';
 import { OrderService } from '../../../application/order.service';
 import { PrismaOrderRepository } from '../../persistence/prisma-order.repository';
 import { authenticate, requireRole } from '../../../../../middleware/auth';
+import { validate } from '../../../../../middleware/validate';
+import { createOrderSchema, updateStatusSchema } from '../../../application/order.schemas';
 
 const router: Router = Router();
 
@@ -219,7 +221,7 @@ router.get('/:id', authenticate, (req, res) => orderController.getById(req, res)
  *       400:
  *         description: Invalid input
  */
-router.post('/', authenticate, (req, res) => orderController.create(req, res));
+router.post('/', authenticate, validate(createOrderSchema), (req, res) => orderController.create(req, res));
 
 /**
  * @swagger
@@ -250,7 +252,7 @@ router.post('/', authenticate, (req, res) => orderController.create(req, res));
  *       201:
  *         description: Guest order created
  */
-router.post('/guest', (req, res) => orderController.createGuestOrder(req, res));
+router.post('/guest', validate(createOrderSchema), (req, res) => orderController.createGuestOrder(req, res));
 
 /**
  * @swagger
@@ -292,7 +294,7 @@ router.post('/guest', (req, res) => orderController.createGuestOrder(req, res));
  *       404:
  *         description: Order not found
  */
-router.patch('/:id', authenticate, (req, res) => orderController.updateStatus(req, res));
+router.patch('/:id', authenticate, validate(updateStatusSchema), (req, res) => orderController.updateStatus(req, res));
 
 /**
  * @swagger

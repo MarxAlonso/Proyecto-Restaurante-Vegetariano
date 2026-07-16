@@ -27,56 +27,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function loadUser() {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
-      if (token) {
-        try {
-          const userData = await fetchApi('/auth/me');
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-        } catch (error) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      } else if (userStr) {
-        localStorage.removeItem('user');
+      try {
+        // Security best practice: No almacenar JWT en localStorage.
+        // El token se envía automáticamente vía cookie httpOnly,
+        // lo que previene exfiltración por XSS (ISO 25010 - Security).
+        const userData = await fetchApi('/auth/me');
+        setUser(userData);
+      } catch {
+        // Sin sesión activa — estado por defecto
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadUser();
   }, []);
 
   const login = async (credentials: any) => {
-    try {
-      const { user: userData, token } = await fetchApi('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-      });
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      
-      const role = userData.role;
-      if (role === "ADMIN") {
-        router.replace("/paneladmin");
-      } else if (role === "KITCHEN") {
-        router.replace("/panelkitchen");
-      } else {
-        router.replace("/panel");
-      }
-    } catch (error) {
-      throw error;
+    // Security: El backend setea la cookie httpOnly automáticamente.
+    // No almacenamos el token en localStorage — la cookie viaja sola.
+    const { user: userData } = await fetchApi('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+
+    setUser(userData);
+
+    const role = userData.role;
+    if (role === 'ADMIN') {
+      router.replace('/paneladmin');
+    } else if (role === 'KITCHEN') {
+      router.replace('/panelkitchen');
+    } else {
+      router.replace('/panel');
     }
   };
 
   const logout = async () => {
     try {
+      // Security: El backend limpia la cookie httpOnly
       await fetchApi('/auth/logout', { method: 'POST' });
     } catch (error) {
       console.error('Error al cerrar sesión en el servidor:', error);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Limpieza local de estado
       sessionStorage.clear();
       setUser(null);
       router.replace('/login');

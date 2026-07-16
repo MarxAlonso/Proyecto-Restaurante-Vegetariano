@@ -1,6 +1,25 @@
 import { MenuItemRepository } from '../../domain/menu-item.repository';
 import { MenuItemEntity } from '../../domain/menu-item.entity';
 import prisma from '../../../../infrastructure/persistence/prisma.client';
+import { Prisma } from '@prisma/client';
+
+type MenuItemWithCategory = Prisma.MenuItemGetPayload<{
+  include: { category: true };
+}>;
+
+function toMenuItemEntity(item: MenuItemWithCategory): MenuItemEntity {
+  return {
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: Number(item.price),
+    categoryId: item.categoryId,
+    category: item.category,
+    image: item.image,
+    available: item.available,
+    createdAt: item.createdAt,
+  };
+}
 
 export class PrismaMenuItemRepository implements MenuItemRepository {
   async findAll(): Promise<MenuItemEntity[]> {
@@ -8,7 +27,7 @@ export class PrismaMenuItemRepository implements MenuItemRepository {
       include: { category: true },
       orderBy: { createdAt: 'desc' },
     });
-    return items as any as MenuItemEntity[];
+    return items.map(toMenuItemEntity);
   }
 
   async findById(id: string): Promise<MenuItemEntity | null> {
@@ -16,7 +35,7 @@ export class PrismaMenuItemRepository implements MenuItemRepository {
       where: { id },
       include: { category: true },
     });
-    return item as any as MenuItemEntity | null;
+    return item ? toMenuItemEntity(item) : null;
   }
 
   async save(item: Omit<MenuItemEntity, 'id' | 'createdAt'>): Promise<MenuItemEntity> {
@@ -31,15 +50,15 @@ export class PrismaMenuItemRepository implements MenuItemRepository {
       },
       include: { category: true },
     });
-    return created as any as MenuItemEntity;
+    return toMenuItemEntity(created);
   }
 
   async update(id: string, item: Partial<MenuItemEntity>): Promise<MenuItemEntity> {
-    const data: any = {};
+    const data: Prisma.MenuItemUpdateInput = {};
     if (item.name !== undefined) data.name = item.name;
     if (item.description !== undefined) data.description = item.description;
     if (item.price !== undefined) data.price = item.price as any;
-    if (item.categoryId !== undefined) data.categoryId = item.categoryId;
+    if (item.categoryId !== undefined) data.category = { connect: { id: item.categoryId } };
     if (item.image !== undefined) data.image = item.image;
     if (item.available !== undefined) data.available = item.available;
 
@@ -48,7 +67,7 @@ export class PrismaMenuItemRepository implements MenuItemRepository {
       data,
       include: { category: true },
     });
-    return updated as any as MenuItemEntity;
+    return toMenuItemEntity(updated);
   }
 
   async delete(id: string): Promise<void> {

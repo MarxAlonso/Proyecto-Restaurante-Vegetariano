@@ -1,22 +1,77 @@
 import { ReservationRepository } from '../../domain/reservation.repository';
 import { ReservationEntity } from '../../domain/reservation.entity';
 import prisma from '../../../../infrastructure/persistence/prisma.client';
+import { Prisma } from '@prisma/client';
+
+type ReservationWithRelations = Prisma.ReservationGetPayload<{
+  include: {
+    table: true;
+    user: { select: { id: true; name: true; email: true } };
+  };
+}>;
+
+function toReservationEntity(r: ReservationWithRelations): ReservationEntity {
+  return {
+    id: r.id,
+    userId: r.userId,
+    name: r.name,
+    email: r.email,
+    phone: r.phone,
+    date: r.date,
+    time: r.time,
+    guests: r.guests,
+    tableId: r.tableId,
+    table: r.table,
+    user: r.user ?? undefined,
+    specialRequests: r.specialRequests,
+    status: r.status as ReservationEntity['status'],
+    createdAt: r.createdAt,
+  };
+}
+
+type ReservationSimple = Prisma.ReservationGetPayload<{
+  include: { table: true };
+}>;
+
+function toReservationSimple(r: ReservationSimple): ReservationEntity {
+  return {
+    id: r.id,
+    userId: r.userId,
+    name: r.name,
+    email: r.email,
+    phone: r.phone,
+    date: r.date,
+    time: r.time,
+    guests: r.guests,
+    tableId: r.tableId,
+    table: r.table,
+    specialRequests: r.specialRequests,
+    status: r.status as ReservationEntity['status'],
+    createdAt: r.createdAt,
+  };
+}
 
 export class PrismaReservationRepository implements ReservationRepository {
   async findAll(): Promise<ReservationEntity[]> {
     const reservations = await prisma.reservation.findMany({
-      include: { table: true, user: { select: { id: true, name: true, email: true } } },
+      include: {
+        table: true,
+        user: { select: { id: true, name: true, email: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
-    return reservations as any as ReservationEntity[];
+    return reservations.map(toReservationEntity);
   }
 
   async findById(id: string): Promise<ReservationEntity | null> {
     const reservation = await prisma.reservation.findUnique({
       where: { id },
-      include: { table: true, user: { select: { id: true, name: true, email: true } } },
+      include: {
+        table: true,
+        user: { select: { id: true, name: true, email: true } },
+      },
     });
-    return reservation as any as ReservationEntity | null;
+    return reservation ? toReservationEntity(reservation) : null;
   }
 
   async findByUserId(userId: string): Promise<ReservationEntity[]> {
@@ -25,7 +80,7 @@ export class PrismaReservationRepository implements ReservationRepository {
       include: { table: true },
       orderBy: { createdAt: 'desc' },
     });
-    return reservations as any as ReservationEntity[];
+    return reservations.map(toReservationSimple);
   }
 
   async findByDate(date: Date): Promise<ReservationEntity[]> {
@@ -42,7 +97,7 @@ export class PrismaReservationRepository implements ReservationRepository {
       include: { table: true },
       orderBy: { time: 'asc' },
     });
-    return reservations as any as ReservationEntity[];
+    return reservations.map(toReservationSimple);
   }
 
   async create(data: any): Promise<ReservationEntity> {
@@ -67,7 +122,7 @@ export class PrismaReservationRepository implements ReservationRepository {
       data: { status: 'RESERVED' },
     });
 
-    return reservation as any as ReservationEntity;
+    return toReservationSimple(reservation);
   }
 
   async cancel(id: string): Promise<ReservationEntity> {
@@ -82,7 +137,7 @@ export class PrismaReservationRepository implements ReservationRepository {
       data: { status: 'AVAILABLE' },
     });
 
-    return reservation as any as ReservationEntity;
+    return toReservationSimple(reservation);
   }
 
   async getTableAvailability(tableId: string, date: Date, time: string): Promise<boolean> {

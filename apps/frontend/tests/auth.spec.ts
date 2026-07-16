@@ -36,11 +36,11 @@ test.describe('Pruebas de Autenticación y Autorización (Playwright) - RESTVEG'
     await expect(page).toHaveURL(/\/panel$/);
 
     // 3. Verificar elementos en la interfaz del cliente
-    const greeting = page.locator('h1:has-text("¡Hola, Marx!")');
+    const greeting = page.locator('h1:has-text("¡Hola, Client!")');
     await expect(greeting).toBeVisible();
 
-    const pointsCard = page.locator('p:has-text("Puntos Veg")');
-    await expect(pointsCard).toBeVisible();
+    const totalGastado = page.locator('p:has-text("Total Gastado")');
+    await expect(totalGastado).toBeVisible();
   });
 
   test('Debería iniciar sesión correctamente como ADMINISTRADOR y redirigir al panel de administración', async ({ page }) => {

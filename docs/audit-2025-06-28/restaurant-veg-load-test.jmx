@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="RestaurantVeg - Load Test (1000 concurrent users)">
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="BASE_URL" elementType="Argument">
+            <stringProp name="Argument.name">BASE_URL</stringProp>
+            <stringProp name="Argument.value">http://localhost:3001</stringProp>
+          </elementProp>
+          <elementProp name="THROUGHPUT_TARGET" elementType="Argument">
+            <stringProp name="Argument.name">THROUGHPUT_TARGET</stringProp>
+            <stringProp name="Argument.value">100</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+        <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout">10000</stringProp>
+        <stringProp name="HTTPSampler.response_timeout">30000</stringProp>
+      </ConfigTestElement>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="Content-Type" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="1000 Concurrent Users - Create Payment Preference">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">-1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1000</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">30</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">300</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Generate Dynamic Payload">
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="script">
+import java.util.UUID;
+int itemCount = 1 + (int)(Math.random() * 4);
+StringBuilder items = new StringBuilder("[");
+for (int i = 0; i < itemCount; i++) {
+    if (i > 0) items.append(",");
+    String itemName = "Plato-" + UUID.randomUUID().toString().substring(0, 6);
+    double price = 15.0 + Math.random() * 85.0;
+    int qty = 1 + (int)(Math.random() * 3);
+    items.append(String.format(
+        "{\"id\":\"%s\",\"title\":\"%s\",\"name\":\"%s\",\"quantity\":%d,\"price\":%.2f}",
+        "item-" + UUID.randomUUID().toString().substring(0, 8),
+        itemName, itemName, qty, price
+    ));
+}
+items.append("]");
+vars.put("PAYLOAD_ITEMS", items.toString());
+vars.put("CUSTOMER_EMAIL", "cliente." + System.currentTimeMillis() + "@test.com");
+          </stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223PreProcessor>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/mercadopago/create-preference">
+          <stringProp name="HTTPSampler.path">/api/mercadopago/create-preference</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.connect_timeout">10000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">30000</stringProp>
+          <stringProp name="HTTPSampler.postBodyRaw">true</stringProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="body" elementType="Argument">
+                <stringProp name="Argument.value">{
+  "items": ${PAYLOAD_ITEMS},
+  "notes": "Pedido generado por prueba de carga JMeter",
+  "orderType": "DINE_IN",
+  "customerName": "Cliente JMeter",
+  "customerEmail": "${CUSTOMER_EMAIL}",
+  "customerPhone": "999888777"
+}</stringProp>
+                <stringProp name="Argument.metadata">=body</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert HTTP 201">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="1419041995">201</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assert Response Schema">
+            <stringProp name="JSON_PATH">$.orderId</stringProp>
+            <boolProp name="JSONVALIDATION">true</boolProp>
+            <boolProp name="EXPECT_NULL">false</boolProp>
+          </JSONPathAssertion>
+          <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Max Response Time 5000ms">
+            <stringProp name="DurationAssertion.duration">5000</stringProp>
+          </DurationAssertion>
+        </hashTree>
+      </hashTree>
+      <hashTree>
+        <SummaryReport guiclass="SummaryReport" testclass="SummaryReport" testname="Summary Report"/>
+        <ResultCollector guiclass="StatGraphVisualizer" testclass="ResultCollector" testname="Response Times Percentiles"/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

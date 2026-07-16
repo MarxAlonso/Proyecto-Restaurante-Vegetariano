@@ -49,7 +49,7 @@ Este documento contiene la **validación integral y verificación funcional** de
   "Framework": "Express.js",
   "Runtime": "Node.js 20+",
   "ORM": "Prisma 5.x",
-  "BaseURL": "https://restveg-api.railway.app",
+  "BaseURL": "https://restaurante-vegetariano-backend.vercel.app",
   "Autenticación": "JWT + Bcrypt (10 rounds)",
   "CORS": "Origen único verificado"
 }
@@ -206,11 +206,11 @@ Coverage: 100% (18/18 pantallas probadas)
 
 | Sistema Externo | Tipo | Protocolo | Estado | Crítico |
 |---|---|---|---|---|
-| **PostgreSQL (Railway)** | Base de Datos | TCP/5432 + SSL | ✅ Activo | Crítico |
+| **PostgreSQL (Neon)** | Base de Datos | TCP/5432 + SSL | ✅ Activo | Crítico |
 | **MercadoPago API** | Pago Online | REST/HTTPS | ✅ Integrado | Crítico |
 | **Google OAuth 2.0** | Autenticación | OIDC/HTTPS | ✅ Configurado | Opcional |
 | **Vercel Edge Runtime** | Hosting Frontend | HTTPS/HTTP2 | ✅ Productivo | Crítico |
-| **Railway Deployment** | Hosting Backend | HTTPS/SSL | ✅ Productivo | Crítico |
+| **Vercel Deployment** | Hosting Backend | HTTPS/SSL (Serverless) | ✅ Productivo | Crítico |
 | **SMTP (Correo)** | Notificaciones | TLS | ✅ Funcional | Opcional |
 
 ---
@@ -236,7 +236,7 @@ Coverage: 100% (18/18 pantallas probadas)
 
 ### 2.3 Listado de Casos de Prueba de Integración
 
-#### **Grupo A: Integración Base de Datos - PostgreSQL (Railway)**
+#### **Grupo A: Integración Base de Datos - PostgreSQL (Neon)**
 
 | Caso | Sistema Externo | Descripción | Pasos | Resultado Esperado | Estado |
 |------|---|---|---|---|---|
@@ -336,7 +336,7 @@ ROLLBACK;
 ```
 Test Suite: Pruebas de Integración Backend (Supertest + Vitest)
 Project: Restaurant Veg API
-Target: https://restveg-api.railway.app
+Target: https://restaurante-vegetariano-backend.vercel.app
 
 Test Files: 1
   ✓ src/tests/api.spec.ts
@@ -354,7 +354,7 @@ Summary:
   
 Duration: 1.14s
 Coverage: 4 endpoints validados
-Database: PostgreSQL en Railway ✅
+Database: PostgreSQL en Neon ✅
 CORS: Vercel Frontend ✅
 ```
 
@@ -386,7 +386,7 @@ CORS: Vercel Frontend ✅
 - ✅ Pool de conexiones DB: 10 conexiones simultáneas máximo
 - ✅ Timeout de peticiones API: 30 segundos
 - ✅ Reintentos automáticos: 3 intentos con backoff exponencial
-- ✅ Monitoreo: Railway Dashboard + Vercel Analytics
+- ✅ Monitoreo: Vercel Analytics + Neon Dashboard
 - ✅ Logs centralizados: Winston + Loggly (opcional)
 
 #### **Nivel de Cumplimiento ISO 25010 Interoperabilidad**
@@ -678,9 +678,9 @@ Motivo: Sistema valida 100% de funcionalidades requeridas,
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. INTEROPERABILIDAD (ISO/IEC 25010 - Integración) 4/4 ✅   │
 ├─────────────────────────────────────────────────────────────┤
-│  ✓ PostgreSQL Railway: 99.95% disponibilidad                │
+│  ✓ PostgreSQL (Neon): 99.95% disponibilidad                 │
 │  ✓ MercadoPago SDK: Integración completa                    │
-│  ✓ Vercel Frontend ↔ Railway Backend: CORS OK               │
+│  ✓ Frontend ↔ Backend (Vercel): CORS OK                     │
 │  ✓ Coexistencia sistemas externos: 100%                     │
 │  ✓ Integridad referencial DB: Validada                      │
 ├─────────────────────────────────────────────────────────────┤
@@ -740,16 +740,16 @@ Motivo: Sistema valida 100% de funcionalidades requeridas,
 
 ✅ **Despliegue en Cloud**
 - [x] Frontend: https://restaurant-veg.vercel.app ✅
-- [x] Backend: Railway (PostgreSQL + API)
+- [x] Backend: Vercel (Serverless + Neon PostgreSQL)
 - [x] CI/CD: GitHub Actions → Vercel Deploy
-- [x] Monitoreo: Vercel Analytics + Railway Dashboard
+- [x] Monitoreo: Vercel Analytics + Neon Dashboard
 
 ---
 
 ## Recomendaciones Finales
 
 1. **Monitoreo Continuo**: Implementar alertas en Vercel Analytics para detectar anomalías
-2. **Backup Automático**: Configurar snapshots diarios de PostgreSQL en Railway
+2. **Backup Automático**: Configurar snapshots diarios de PostgreSQL en Neon
 3. **Load Testing Regular**: Ejecutar k6 semanalmente para garantizar rendimiento
 4. **Auditoría de Seguridad**: Realizar pentesting trimestral con herramientas como OWASP ZAP
 5. **Documentación de API**: Generar OpenAPI/Swagger para facilitar integración externa
@@ -760,4 +760,4 @@ Motivo: Sistema valida 100% de funcionalidades requeridas,
 
 **Generado**: 2024-06-17  
 **Por**: Marx Alonso (Estudiante)  
-**Validado**: Sistema en producción - Vercel + Railway
+**Validado**: Sistema en producción - Vercel (Frontend + Backend) + Neon (DB)

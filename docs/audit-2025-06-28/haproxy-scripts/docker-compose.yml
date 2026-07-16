@@ -1,0 +1,138 @@
+# docker-compose.yml — Simulación local del stack HA
+# Uso: docker compose -f docs/audit-2025-06-28/haproxy-scripts/docker-compose.yml up -d
+#
+# Esto levanta localmente:
+#   - 2 API Nodes (Express)
+#   - 2 HAProxy (active-passive con keepalived simulado)
+#   - 2 PostgreSQL (primary-standby streaming replication)
+#
+# Ideal para pruebas de concepto sin servidores reales.
+
+version: "3.9"
+
+networks:
+  ha-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  # =============================================
+  # PostgreSQL Primary
+  # =============================================
+  pg-primary:
+    image: postgres:16-alpine
+    container_name: pg-primary
+    networks:
+      ha-network:
+        ipv4_address: 10.0.0.30
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: restaurant_veg
+    volumes:
+      - pg-primary-data:/var/lib/postgresql/data
+      - ./pg-init-primary.sh:/docker-entrypoint-initdb.d/01-init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # =============================================
+  # PostgreSQL Standby (conectado al primary)
+  # =============================================
+  pg-standby:
+    image: postgres:16-alpine
+    container_name: pg-standby
+    networks:
+      ha-network:
+        ipv4_address: 10.0.0.31
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: restaurant_veg
+    volumes:
+      - pg-standby-data:/var/lib/postgresql/data
+    command: >
+      bash -c "
+        rm -rf /var/lib/postgresql/data/*;
+        pg_basebackup -h 10.0.0.30 -D /var/lib/postgresql/data -U replicator -P -v -R -X stream;
+        echo 'hot_standby = on' >> /var/lib/postgresql/data/postgresql.conf;
+        docker-entrypoint.sh postgres
+      "
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+
+  # =============================================
+  # API Node.js — Nodo 1
+  # =============================================
+  api-1:
+    image: node:20-alpine
+    container_name: api-1
+    networks:
+      ha-network:
+        ipv4_address: 10.0.0.20
+    working_dir: /app
+    volumes:
+      - ../../apps/backend:/app
+      - /app/node_modules
+    command: sh -c "npm install -g pnpm && pnpm install && npx prisma generate && npx tsx src/index.ts"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@10.0.0.30:5432/restaurant_veg?connection_limit=5
+      FRONTEND_URL: http://10.0.0.100:3000
+      VERCEL: "0"
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+
+  # =============================================
+  # API Node.js — Nodo 2
+  # =============================================
+  api-2:
+    image: node:20-alpine
+    container_name: api-2
+    networks:
+      ha-network:
+        ipv4_address: 10.0.0.21
+    working_dir: /app
+    volumes:
+      - ../../apps/backend:/app
+      - /app/node_modules
+    command: sh -c "npm install -g pnpm && pnpm install && npx prisma generate && npx tsx src/index.ts"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@10.0.0.30:5432/restaurant_veg?connection_limit=5
+      FRONTEND_URL: http://10.0.0.100:3000
+      VERCEL: "0"
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+
+  # =============================================
+  # HAProxy — Active (nodo primario)
+  # =============================================
+  haproxy-1:
+    image: haproxy:3.0-alpine
+    container_name: haproxy-1
+    networks:
+      ha-network:
+        ipv4_address: 10.0.0.10
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "8404:8404"
+    volumes:
+      - ./haproxy-docker.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - api-1
+      - api-2
+
+volumes:
+  pg-primary-data:
+  pg-standby-data:

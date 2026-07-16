@@ -1,4 +1,5 @@
 import { OrderRepository } from '../domain/order.repository';
+import prisma from '../../../infrastructure/persistence/prisma.client';
 
 export class OrderService {
   constructor(private orderRepository: OrderRepository) {}
@@ -83,25 +84,62 @@ export class OrderService {
     });
   }
 
+  /**
+   * Security best practice: Usar agregaciones nativas de Prisma/PostgreSQL
+   * en lugar de cargar TODOS los registros en memoria y filtrar en JS.
+   *
+   * Antes: this.orderRepository.findAllWithFilters({}) cargaba 100k+ filas
+   * en RAM para luego filtrar con .filter() en JavaScript.
+   * Ahora: Prisma aggregate/groupBy delega el cómputo a PostgreSQL.
+   *
+   * ISO 25010 - Time Behaviour: O(1) en RAM vs O(n) anterior
+   * ISO 25010 - Resource Utilization: Evita OOM en Edge Functions
+   */
   async getAdminStats() {
-    const allOrders = await this.orderRepository.findAllWithFilters({});
-    const approvedOrders = allOrders.filter(o => o.paymentStatus === 'APPROVED');
-    const totalRevenue = approvedOrders.reduce((sum, o) => sum + Number(o.total), 0);
-    const dineIn = approvedOrders.filter(o => o.orderType === 'DINE_IN');
-    const takeaway = approvedOrders.filter(o => o.orderType === 'TAKEAWAY');
-    const pendingOrders = allOrders.filter(o => o.status === 'PENDING').length;
-    const preparingOrders = allOrders.filter(o => o.status === 'PREPARING').length;
-    const completedOrders = allOrders.filter(o => o.status === 'COMPLETED').length;
+    // Usar aggregate para totales en una sola query SQL
+    const [approvedAgg, statusCounts, typeStats] = await Promise.all([
+      prisma.order.aggregate({
+        _count: { id: true },
+        _sum: { total: true },
+        where: { paymentStatus: 'APPROVED' },
+      }),
+      prisma.order.groupBy({
+        by: ['status'],
+        _count: { _all: true },
+      }),
+      prisma.order.groupBy({
+        by: ['orderType'],
+        where: { paymentStatus: 'APPROVED' },
+        _count: { orderType: true },
+        _sum: { total: true },
+      }),
+    ]);
+
+    const statusMap: Record<string, number> = {
+      PENDING: 0, PREPARING: 0, READY: 0, COMPLETED: 0, CANCELLED: 0,
+    };
+    statusCounts.forEach((s) => { statusMap[s.status] = s._count._all; });
+
+    const totalOrders = statusCounts.reduce((sum, s) => sum + s._count._all, 0);
+
+    const dineIn = typeStats.find(t => t.orderType === 'DINE_IN');
+    const takeaway = typeStats.find(t => t.orderType === 'TAKEAWAY');
 
     return {
-      totalOrders: allOrders.length,
-      approvedOrders: approvedOrders.length,
-      totalRevenue,
-      dineIn: { count: dineIn.length, total: dineIn.reduce((s, o) => s + Number(o.total), 0) },
-      takeaway: { count: takeaway.length, total: takeaway.reduce((s, o) => s + Number(o.total), 0) },
-      pendingOrders,
-      preparingOrders,
-      completedOrders,
+      totalOrders,
+      approvedOrders: approvedAgg._count.id,
+      totalRevenue: Number(approvedAgg._sum.total ?? 0),
+      dineIn: {
+        count: dineIn?._count.orderType ?? 0,
+        total: Number(dineIn?._sum.total ?? 0),
+      },
+      takeaway: {
+        count: takeaway?._count.orderType ?? 0,
+        total: Number(takeaway?._sum.total ?? 0),
+      },
+      pendingOrders: statusMap['PENDING'],
+      preparingOrders: statusMap['PREPARING'],
+      completedOrders: statusMap['COMPLETED'],
       monthlyRevenue: 0,
     };
   }

@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -6,9 +6,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 
-import path from 'path';
-
 import { swaggerSpec } from './infrastructure/swagger.config';
+import logger from './infrastructure/logger';
 import authRoutes from './modules/auth/infrastructure/http/routes/auth.route';
 import menuRoutes from './modules/menu/infrastructure/http/routes/menu.route';
 import categoryRoutes from './modules/categories/infrastructure/http/routes/category.route';
@@ -27,20 +26,28 @@ const isVercelServerless = process.env.VERCEL === '1';
 const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
 
 if (!isVercelServerless && !isTestEnvironment) {
-  // Seed the database only when running a dedicated server instance locally or in a non-serverless environment.
   seedDatabase().catch(err => {
-    console.error('❌ Error during seeding:', err);
+    logger.error({ err }, '❌ Error during seeding');
   });
 }
 
 const app: Application = express();
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'test' ? 3002 : 3001);
 
-// Middlewares de Seguridad
+// ============================================================
+// Security: Hardening de Express
+// ISO 25010 - Security, EXPRESS-FINGERPRINT-001, EXPRESS-BODY-001
+// ============================================================
+
+// Deshabilitar header X-Powered-By para reducir fingerprinting
+app.disable('x-powered-by');
+
+// Security headers con Helmet
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // Permite cargar imágenes desde otro origen (Frontend)
+  crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
+// Rate limiting general
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // Límite de 100 peticiones por IP cada 15 minutos
@@ -49,25 +56,24 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiting específico para auth — más restrictivo
 const authLimiter = rateLimit({
-  windowMs: 1000, // 1 segundo
-  max: 100, // Límite de 100 peticiones por IP por segundo para rutas de autenticación (login, register, google)
-  message: { error: 'Demasiados intentos de autenticación desde esta IP, por favor intente de nuevo más tarde.' },
+  windowMs: 60 * 1000, // 1 minuto
+  max: 20, // 20 intentos por minuto (antes era 100/segundo, demasiado permisivo)
+  message: { error: 'Demasiados intentos de autenticación. Espere un minuto.' },
   standardHeaders: true,
   legacyHeaders: false,
-  skipFailedRequests: false,
-  skipSuccessfulRequests: false,
   skip: () => process.env.NODE_ENV === 'test',
 });
 
-// Aplicar rate limiting general a todas las rutas de API
 app.use('/api', generalLimiter);
 
+// CORS — allowlist explícita
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://restaurante-vegetariano-frontend.vercel.app'
+      'https://restaurante-vegetariano-frontend.vercel.app',
     ];
     const cleanedOrigin = origin?.replace(/\/$/, '') || '';
     if (allowedOrigins.includes(cleanedOrigin) || !origin) {
@@ -79,8 +85,16 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json());
+// Body parsers con límites explícitos
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
+
+// Request logging con Pino
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  logger.info({ req }, `${req.method} ${req.path}`);
+  next();
+});
 
 // Swagger UI
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -116,8 +130,8 @@ app.get('/', (_req, res) => {
       payments: '/api/payments',
       mercadopago: '/api/mercadopago',
       tables: '/api/tables',
-      reservations: '/api/reservations'
-    }
+      reservations: '/api/reservations',
+    },
   });
 });
 
@@ -136,9 +150,37 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ============================================================
+// Error handling — Security: No exponer stack traces en producción
+// ISO 25010 - Reliability, EXPRESS-ERROR-001
+// ============================================================
+
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    error: 'Endpoint no encontrado',
+    message: 'Verifica la URL e intenta de nuevo',
+  });
+});
+
+// Error handler global
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  logger.error({ err }, 'Unhandled error');
+
+  const statusCode = (err as any).statusCode || 500;
+  const message = process.env.NODE_ENV === 'production'
+    ? 'Error interno del servidor'
+    : err.message;
+
+  res.status(statusCode).json({
+    error: message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
+  });
+});
+
 if (!isVercelServerless && !isTestEnvironment) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    logger.info({ port: PORT }, `🚀 Server running on port ${PORT}`);
   });
 }
 

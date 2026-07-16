@@ -3,6 +3,8 @@ import { AuthController } from '../controllers/auth.controller';
 import { AuthService } from '../../../application/auth.service';
 import { PrismaUserRepository } from '../../persistence/prisma-user.repository';
 import { authenticate } from '../../../../../middleware/auth';
+import { validate } from '../../../../../middleware/validate';
+import { registerSchema, loginSchema, googleLoginSchema } from '../../../application/auth.schemas';
 
 const router: Router = Router();
 
@@ -55,7 +57,7 @@ const authController = new AuthController(authService);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/register', (req, res) => authController.register(req, res));
+router.post('/register', validate(registerSchema), (req, res) => authController.register(req, res));
 
 /**
  * @swagger
@@ -97,7 +99,7 @@ router.post('/register', (req, res) => authController.register(req, res));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login', (req, res) => authController.login(req, res));
+router.post('/login', validate(loginSchema), (req, res) => authController.login(req, res));
 
 /**
  * @swagger
@@ -129,7 +131,7 @@ router.post('/login', (req, res) => authController.login(req, res));
  *       401:
  *         description: Invalid Google token
  */
-router.post('/google', (req, res) => authController.googleLogin(req, res));
+router.post('/google', validate(googleLoginSchema), (req, res) => authController.googleLogin(req, res));
 
 /**
  * @swagger
