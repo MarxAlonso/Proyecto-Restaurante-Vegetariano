@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
@@ -42,6 +43,7 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               {children}
+              <SpeedInsights />
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
