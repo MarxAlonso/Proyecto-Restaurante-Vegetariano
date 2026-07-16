@@ -1,0 +1,16 @@
+psql: warning: extra command-line argument "User\
+UNION ALL
+SELECT 'MenuItem', COUNT(*) FROM \MenuItem\
+UNION ALL
+SELECT 'Category', COUNT(*) FROM \Category\
+UNION ALL
+SELECT 'Order', COUNT(*) FROM \Order\
+UNION ALL
+SELECT 'OrderItem', COUNT(*) FROM \OrderItem\
+UNION ALL
+SELECT 'Table', COUNT(*) FROM \Table\
+UNION ALL
+SELECT 'Reservation', COUNT(*) FROM \Reservation\;" ignored
+ERROR:  syntax error at or near "\"
+LINE 2: SELECT 'User' as tabla, COUNT(*) as registros FROM \
+                                                           ^

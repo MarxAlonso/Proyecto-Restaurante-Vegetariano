@@ -1,0 +1,3 @@
+NAMES                 STATUS
+restaurant-frontend   Up 55 seconds (unhealthy)
+restaurant-backend    Up 21 seconds (healthy)

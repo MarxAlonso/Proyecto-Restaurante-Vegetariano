@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 COPY next.config.ts tsconfig.json postcss.config.mjs eslint.config.mjs ./
 COPY public ./public

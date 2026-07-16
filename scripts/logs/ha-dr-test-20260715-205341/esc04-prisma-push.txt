@@ -1,0 +1,12 @@
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "restaurant_db", schema "public" at "postgres:5432"
+
+­ƒÜÇ  Your database is now in sync with your Prisma schema. Done in 487ms
+
+Running generate... (Use --skip-generate to skip the generators)
+Error: Can't write to /app/node_modules/prisma please make sure you install "prisma" with the right permissions.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 12.0.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+npm notice To update run: npm install -g npm@12.0.1
+npm notice

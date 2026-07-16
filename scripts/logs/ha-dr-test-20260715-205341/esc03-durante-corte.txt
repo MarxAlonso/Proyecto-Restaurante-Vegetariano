@@ -1,0 +1,4 @@
+NAMES                 STATUS
+restaurant-frontend   Up About a minute (unhealthy)
+restaurant-backend    Up 42 seconds (healthy)
+restaurant-postgres   Up 20 seconds (healthy)
